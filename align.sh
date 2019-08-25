@@ -3,7 +3,7 @@ mkdir data_align
 
 # trainpref='data/train_merge'
 # trainpref='data/valid'
-trainpref="$DATA/lang8_unidic1k.train"
+trainpref=$DATA/$TRAIN_PREF
 fast_align_dir='/lab/ogawa/tools/fast_align/build/'
 mosesdecoder_dir='/lab/ogawa/tools/mosesdecoder/'
 
