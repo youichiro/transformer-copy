@@ -11,7 +11,8 @@ Translate pre-processed data with a trained model.
 
 import torch
 
-from fairseq import bleu, options, progress_bar, tasks, tokenizer, utils
+# from fairseq import bleu, options, progress_bar, tasks, tokenizer, utils
+from fairseq import options, progress_bar, tasks, tokenizer, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
 from fairseq.utils import import_user_module
 
@@ -90,10 +91,11 @@ def main(args):
     generator = task.build_generator(args)
 
     # Generate and compute BLEU score
-    if args.sacrebleu:
-        scorer = bleu.SacrebleuScorer()
-    else:
-        scorer = bleu.Scorer(tgt_dict.pad(), tgt_dict.eos(), tgt_dict.unk())
+    # if args.sacrebleu:
+    #     scorer = bleu.SacrebleuScorer()
+    # else:
+    #     scorer = bleu.Scorer(tgt_dict.pad(), tgt_dict.eos(), tgt_dict.unk())
+
     num_sentences = 0
     has_target = True
     with progress_bar.build_progress_bar(args, itr) as t:
@@ -171,10 +173,10 @@ def main(args):
                         if align_dict is not None or args.remove_bpe is not None:
                             # Convert back to tokens for evaluation with unk replacement and/or without BPE
                             target_tokens = tgt_dict.encode_line(target_str, add_if_not_exist=False)
-                        if hasattr(scorer, 'add_string'):
-                            scorer.add_string(target_str, hypo_str)
-                        else:
-                            scorer.add(target_tokens, hypo_tokens)
+                        # if hasattr(scorer, 'add_string'):
+                        #     scorer.add_string(target_str, hypo_str)
+                        # else:
+                        #     scorer.add(target_tokens, hypo_tokens)
 
             wps_meter.update(num_generated_tokens)
             t.log({'wps': round(wps_meter.avg)})
@@ -183,7 +185,8 @@ def main(args):
     print('| Translated {} sentences ({} tokens) in {:.1f}s ({:.2f} sentences/s, {:.2f} tokens/s)'.format(
         num_sentences, gen_timer.n, gen_timer.sum, num_sentences / gen_timer.sum, 1. / gen_timer.avg))
     if has_target:
-        print('| Generate {} with beam={}: {}'.format(args.gen_subset, args.beam, scorer.result_string()))
+        # print('| Generate {} with beam={}: {}'.format(args.gen_subset, args.beam, scorer.result_string()))
+        print('| Generate {} with beam={}'.format(args.gen_subset, args.beam))
 
 
 def cli_main():
