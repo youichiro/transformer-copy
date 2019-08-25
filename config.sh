@@ -15,13 +15,13 @@ fi
 # OUT='out' # output dir
 # CORPUS=$DATA/train_1b.tgt  # monolingual corpus for generate artificial data
 DATA='data_ja'
-DATA_ART='data_ja_art'
 OUT='out_ja'
 CORPUS_PREF='bccwj1k'
 TRAIN_PREF='lang8_unidic1k.train'
 VALID_PREF='lang8_unidic.dev'
 TEST_PREF='naist_clean_unidic'
 DICT='dict_ja.src.txt'
+DATA_ART="data_ja_art/$CORPUS_PREF"
 
 DATA_BIN=$OUT/data_bin
 DATA_RAW=$OUT/data_raw
