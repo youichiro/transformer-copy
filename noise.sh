@@ -2,6 +2,8 @@
 set -e
 set -x
 
+mkdir data_art
+
 # generate data with noise
 python noise_data.py -e 1 -s 9182
 python noise_data.py -e 2 -s 78834
