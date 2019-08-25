@@ -17,13 +17,9 @@ fi
 DATA='data_ja'
 DATA_ART='data_ja_art'
 OUT='out_ja'
-CORPUS_NAME='bccwj1k.tgt'
+CORPUS_PREF='bccwj1k'
 TRAIN_PREF='lang8_unidic.train'
 VALID_PREF='lang8_unidic.dev'
-
-CORPUS=$DATA/$CORPUS_NAME
-TRAIN_PREF=$DATA/$TRAIN_PREF
-VALID_PREF=$DATA/$VALID_PREF
 
 mkdir $DATA_ART
 
