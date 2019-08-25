@@ -6,7 +6,7 @@ DATA_BIN=$OUT/data_bin_art/data_bin_art
 CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
 --save-dir $MODELS \
 --max-epoch $data_epoch \
---batch-size 16 \
+--batch-size 4 \
 --max-tokens 3000 \
 --train-subset train \
 --valid-subset valid \
