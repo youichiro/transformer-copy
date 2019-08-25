@@ -10,10 +10,6 @@ if [ $# -ge 2 ]; then
     exp=$2
 fi
 
-# DATA='data' # input dir
-# DATA_ART='data_art' # artificial data dir
-# OUT='out' # output dir
-# CORPUS=$DATA/train_1b.tgt  # monolingual corpus for generate artificial data
 DATA='data_ja'
 OUT='out_ja'
 CORPUS_PREF='bccwj'
