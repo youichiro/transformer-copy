@@ -15,6 +15,7 @@ import torch
 from fairseq import options, progress_bar, tasks, tokenizer, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
 from fairseq.utils import import_user_module
+from tqdm import tqdm
 
 
 def main(args):
@@ -114,7 +115,7 @@ def main(args):
             num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
             gen_timer.stop(num_generated_tokens)
 
-            for i, sample_id in enumerate(sample['id'].tolist()):
+            for i, sample_id in enumerate(tqdm(sample['id'].tolist())):
                 has_target = sample['target'] is not None
 
                 # Remove padding
