@@ -30,7 +30,7 @@ class NoiseInjector(object):
         shuffle_key = [i + np.random.normal(loc=0, scale=self.shuffle_sigma) for i in range(len(tgt))]
         new_idx = np.argsort(shuffle_key)
         res = [tgt[i] for i in new_idx]
-            
+
         return res
 
     def _replace_func(self, tgt):
@@ -38,7 +38,7 @@ class NoiseInjector(object):
         ret = []
         rnd = np.random.random(len(tgt))
         for i, p in enumerate(tgt):
-            if rnd[i] < replace_ratio: 
+            if rnd[i] < replace_ratio:
                 rnd_ex = self.corpus[np.random.randint(len(self.corpus))]
                 rnd_word = rnd_ex[np.random.randint(len(rnd_ex))]
                 ret.append((-1, rnd_word))
@@ -85,7 +85,7 @@ class NoiseInjector(object):
 
         funcs = [self._add_func, self._shuffle_func, self._replace_func, self._delete_func]
         np.random.shuffle(funcs)
-        
+
         pairs = [(i, w) for (i, w) in enumerate(tokens)]
         for f in funcs:
             pairs = f(pairs)
@@ -104,14 +104,14 @@ def noise(filename, ofile_suffix):
     lines = open(filename).readlines()
     tgts = [tokenize_line(line.strip()) for line in lines]
     noise_injector = NoiseInjector(tgts)
-    
+
     srcs = []
     aligns = []
     for tgt in tgts:
         src, align = noise_injector.inject_noise(tgt)
         srcs.append(src)
         aligns.append(align)
-    
+
     save_file('{}.src'.format(ofile_suffix), srcs)
     save_file('{}.tgt'.format(ofile_suffix), tgts)
     save_file('{}.forward'.format(ofile_suffix), aligns)

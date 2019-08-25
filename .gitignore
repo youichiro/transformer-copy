@@ -4,3 +4,5 @@ __pycache__
 out/*
 fairseq.egg-info
 build
+data/*
+!.gitkeep

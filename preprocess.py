@@ -119,7 +119,7 @@ def main(args):
         )
         offsets = Binarizer.find_offsets(input_file, num_workers)
         pool = None
-        if num_workers > 1:  # todo: not support copy 
+        if num_workers > 1:  # todo: not support copy
             pool = Pool(processes=num_workers - 1)
             for worker_id in range(1, num_workers):
                 prefix = "{}{}".format(output_prefix, worker_id)
@@ -134,7 +134,7 @@ def main(args):
                         offsets[worker_id],
                         offsets[worker_id + 1]
                     ),
-                    callback=merge_result  
+                    callback=merge_result
                 )
             pool.close()
 
