@@ -120,6 +120,8 @@ def noise(filename, ofile_suffix):
 import argparse
 
 parser=argparse.ArgumentParser()
+parser.add_argument('-c', '--corpus', type=str, default='data/train_1b.tgt')
+parser.add_argument('-o', '--output-dir', type=str, default='data_art')
 parser.add_argument('-e', '--epoch', type=int, default=10)
 parser.add_argument('-s', '--seed', type=int, default=2468)
 
@@ -127,9 +129,8 @@ args = parser.parse_args()
 np.random.seed(args.seed)
 if __name__ == '__main__':
     print("epoch={}, seed={}".format(args.epoch, args.seed))
+    filename = args.corpus.split('/')[-1].split('.')[0]
+    ofile_suffix = f'{args.output_dir}/{filename}_{args.epoch}'
 
-    filename = './data/train_1b.tgt'
-    ofile_suffix = './data_art/train_1b_{}'.format(args.epoch)
-
-    noise(filename, ofile_suffix)
+    noise(args.corpus, ofile_suffix)
 

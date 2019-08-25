@@ -10,8 +10,12 @@ if [ $# -ge 2 ]; then
     exp=$2
 fi
 
-DATA='data' # input dir
-OUT='out' # output dir
+# DATA='data' # input dir
+# DATA_ART='data_art' # artificial data dir
+# OUT='out' # output dir
+DATA='data_ja'
+DATA_ART='data_ja_art'
+OUT='out_ja'
 
 DATA_BIN=$OUT/data_bin
 DATA_RAW=$OUT/data_raw
