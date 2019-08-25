@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+source ./config.sh
+
 set -e
 set -x
 
