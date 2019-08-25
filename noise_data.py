@@ -1,6 +1,7 @@
 import numpy as np
 import re
 import shutil
+from tqdm import tqdm
 
 from fairseq.tokenizer import tokenize_line
 
@@ -107,7 +108,7 @@ def noise(filename, ofile_suffix):
 
     srcs = []
     aligns = []
-    for tgt in tgts:
+    for tgt in tqdm(tgts):
         src, align = noise_injector.inject_noise(tgt)
         srcs.append(src)
         aligns.append(align)
