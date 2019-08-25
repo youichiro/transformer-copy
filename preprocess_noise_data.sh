@@ -18,7 +18,7 @@ for epoch in {1..9}; do
     echo $epoch
 
     trainpref=${DATA_ART}/${CORPUS_NAME}_$epoch
-    validpref=${DATA}/valid
+    validpref=$VALID_PREF
     destdir=$OUT/data_bin_art/data_bin_art_$epoch
 
     # preprocess train/valid
