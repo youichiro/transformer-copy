@@ -16,8 +16,8 @@ fi
 # CORPUS=$DATA/train_1b.tgt  # monolingual corpus for generate artificial data
 DATA='data_ja'
 OUT='out_ja'
-CORPUS_PREF='bccwj1k'
-TRAIN_PREF='lang8_unidic1k.train'
+CORPUS_PREF='bccwj'
+TRAIN_PREF='lang8_unidic.train'
 VALID_PREF='lang8_unidic.dev'
 TEST_PREF='naist_clean_unidic'
 DICT='dict_ja.src.txt'

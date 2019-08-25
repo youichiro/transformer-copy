@@ -5,7 +5,7 @@ set -e
 set -x
 
 mkdir -p $DATA_ART
-$corpus = $DATA/${CORPUS_PREF}.tgt
+corpus=$DATA/${CORPUS_PREF}.tgt
 
 # generate data with noise
 python noise_data.py -c $corpus -o $DATA_ART -e 1 -s 9182
