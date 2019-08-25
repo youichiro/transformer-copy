@@ -13,12 +13,13 @@ copy_params='--copy-ext-dict'
 # set common params between train/test
 common_params='--source-lang src --target-lang tgt
 --padding-factor 1
---srcdict ./dicts/dict.src.txt
+--srcdict ./dicts/dict_ja.src.txt
 --joined-dictionary
 '
 
-trainpref='data/train_merge'
-validpref='data/valid'
+trainpref=$DATA/$TRAIN_PREF
+validpref=$DATA/$VALID_PREF
+testpref=$DATA/$TEST_PREF
 
 # preprocess train/valid
 python preprocess.py \
@@ -28,16 +29,16 @@ $copy_params \
 --validpref $validpref \
 --destdir $DATA_BIN \
 --output-format binary \
---alignfile $trainpref.forward \
-| tee $OUT/data_bin.log
+--alignfile $trainpref.forward
+# | tee $OUT/data_bin.log
 
 # preprocess test
 python preprocess.py \
 $common_params \
 $copy_params \
---testpref data/test \
+--testpref $testpref \
 --destdir $DATA_RAW \
---output-format raw \
-| tee $OUT/data_raw.log
+--output-format raw
+# | tee $OUT/data_raw.log
 
 mv $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.src.old

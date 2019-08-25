@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 source ./config.sh
 
-pretrained_model=./out/models_pretrain/checkpoint9.pt
+pretrained_model=./out_ja/models_pretrain/checkpoint9.pt
 
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
 --save-dir $MODELS \
 --seed 4321 \
 --max-epoch 9 \
---batch-size 16 \
+--batch-size 8 \
 --max-tokens 3000 \
 --train-subset train \
 --valid-subset valid \
