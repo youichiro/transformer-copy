@@ -4,6 +4,7 @@ source ./config.sh
 set -e
 set -x
 
+mkdir $DATA_ART
 $corpus = $DATA/${CORPUS_PREF}.tgt
 
 # generate data with noise

@@ -21,8 +21,6 @@ CORPUS_PREF='bccwj1k'
 TRAIN_PREF='lang8_unidic.train'
 VALID_PREF='lang8_unidic.dev'
 
-mkdir $DATA_ART
-
 DATA_BIN=$OUT/data_bin
 DATA_RAW=$OUT/data_raw
 mkdir -p $DATA_BIN
