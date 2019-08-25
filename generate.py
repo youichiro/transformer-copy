@@ -101,7 +101,7 @@ def main(args):
     has_target = True
     with progress_bar.build_progress_bar(args, itr) as t:
         wps_meter = TimeMeter()
-        for sample in t:
+        for sample in tqdm(t):
             sample = utils.move_to_cuda(sample) if use_cuda else sample
             if 'net_input' not in sample:
                 continue
@@ -115,7 +115,7 @@ def main(args):
             num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
             gen_timer.stop(num_generated_tokens)
 
-            for i, sample_id in enumerate(tqdm(sample['id'].tolist())):
+            for i, sample_id in enumerate(sample['id'].tolist()):
                 has_target = sample['target'] is not None
 
                 # Remove padding
