@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source ./config.sh
 
-data_epoch=1
+data_epoch=9
 DATA_BIN=$OUT/data_bin_art/data_bin_art
 CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
 --save-dir $MODELS \
