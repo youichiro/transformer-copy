@@ -4,9 +4,6 @@ source ./config.sh
 set -e
 set -x
 
-mkdir $DATA_ART
-CORPUS=$DATA/art_corpus.tgt
-
 # generate data with noise
 python noise_data.py -c $CORPUS -o $DATA_ART -e 1 -s 9182
 python noise_data.py -c $CORPUS -o $DATA_ART -e 2 -s 78834

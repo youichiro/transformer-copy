@@ -13,9 +13,13 @@ fi
 # DATA='data' # input dir
 # DATA_ART='data_art' # artificial data dir
 # OUT='out' # output dir
+# CORPUS=$DATA/train_1b.tgt  # monolingual corpus for generate artificial data
 DATA='data_ja'
 DATA_ART='data_ja_art'
 OUT='out_ja'
+CORPUS_NAME='bccwj1k.tgt'
+CORPUS=$DATA/$CORPUS_NAME
+mkdir $DATA_ART
 
 DATA_BIN=$OUT/data_bin
 DATA_RAW=$OUT/data_raw

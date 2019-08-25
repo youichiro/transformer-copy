@@ -17,7 +17,7 @@ common_params='--source-lang src --target-lang tgt
 for epoch in {1..9}; do
     echo $epoch
 
-    trainpref=${DATA}_art/train_1b_$epoch
+    trainpref=${DATA_ART}/${CORPUS_NAME}_$epoch
     validpref=${DATA}/valid
     destdir=$OUT/data_bin_art/data_bin_art_$epoch
 
