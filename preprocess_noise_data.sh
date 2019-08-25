@@ -17,8 +17,9 @@ common_params='--source-lang src --target-lang tgt
 for epoch in {1..9}; do
     echo $epoch
 
-    trainpref=$DATA/train_1b_$epoch
-    validpref=$DATA/valid
+    trainpref=$DATA_art/train_1b_$epoch
+    validpref=$DATA_art/valid
+    destdir=$OUT/data_bin_art/data_bin_art_$epoch
 
     # preprocess train/valid
     python preprocess.py \
@@ -26,9 +27,9 @@ for epoch in {1..9}; do
     $copy_params \
     --trainpref $trainpref \
     --validpref $validpref \
-    --destdir ${DATA_BIN}_art_$epoch \
+    --destdir $destdir \
     --output-format binary \
     --alignfile $trainpref.forward \
-    | tee $OUT/data_art_bin_$epoch.log
+    | tee $destdir.log
 
 done

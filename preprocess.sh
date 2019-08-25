@@ -11,10 +11,10 @@ rm -rf $DATA_RAW
 copy_params='--copy-ext-dict'
 
 # set common params between train/test
-common_params='--source-lang src --target-lang tgt  
---padding-factor 1 
---srcdict ./dicts/dict.src.txt 
---joined-dictionary 
+common_params='--source-lang src --target-lang tgt
+--padding-factor 1
+--srcdict ./dicts/dict.src.txt
+--joined-dictionary
 '
 
 trainpref='data/train_merge'
