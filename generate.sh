@@ -25,7 +25,7 @@ for epoch in ${epochs[*]}; do
     --max-tokens 6000 \
     --no-progress-bar \
     --raw-text \
-    --batch-size 8 \
+    --batch-size 32 \
     --print-alignment \
     --max-len-a 0 \
     --no-early-stop \
