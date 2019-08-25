@@ -17,5 +17,3 @@ python noise_data.py -c $corpus -o $DATA_ART -e 6 -s 1092
 python noise_data.py -c $corpus -o $DATA_ART -e 7 -s 10688
 python noise_data.py -c $corpus -o $DATA_ART -e 8 -s 50245
 python noise_data.py -c $corpus -o $DATA_ART -e 9 -s 71187
-o
-
