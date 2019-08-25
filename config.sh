@@ -21,6 +21,7 @@ CORPUS_PREF='bccwj1k'
 TRAIN_PREF='lang8_unidic.train'
 VALID_PREF='lang8_unidic.dev'
 TEST_PREF='naist_clean_unidic'
+DICT='dict_ja.src.txt'
 
 DATA_BIN=$OUT/data_bin
 DATA_RAW=$OUT/data_raw

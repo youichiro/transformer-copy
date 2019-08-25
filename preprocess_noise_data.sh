@@ -8,11 +8,11 @@ set -x
 copy_params='--copy-ext-dict'
 
 # set common params between train/test
-common_params='--source-lang src --target-lang tgt
+common_params="--source-lang src --target-lang tgt
 --padding-factor 1
---srcdict ./dicts/dict.src.txt
+--srcdict ./dicts/${DICT}
 --joined-dictionary
-'
+"
 
 for epoch in {1..9}; do
     echo $epoch
