@@ -26,7 +26,4 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
 --log-interval 1000 \
 --positive-label-weight 1.2 \
 --pretrained-model $pretrained_model \
---copy-attention --copy-attention-heads 1
-#  > $OUT/log$exp.out 2>&1 &
-
-# tail -f $OUT/log$exp.out
+--copy-attention --copy-attention-heads 1 | tee $OUT/log$exp.out

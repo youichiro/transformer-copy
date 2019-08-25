@@ -25,7 +25,5 @@ CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
 --no-ema \
 --save-interval-updates 100000 \
 --skip-invalid-size-inputs-valid-test \
---copy-attention --copy-attention-heads 1
+--copy-attention --copy-attention-heads 1 | tee $OUT/log$exp${data_epoch}.out
 # > $OUT/log$exp${data_epoch}.out 2>&1 &
-
-# tail -f $OUT/log$exp${data_epoch}.out

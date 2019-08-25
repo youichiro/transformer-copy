@@ -29,8 +29,7 @@ $copy_params \
 --validpref $validpref \
 --destdir $DATA_BIN \
 --output-format binary \
---alignfile $trainpref.forward
-# | tee $OUT/data_bin.log
+--alignfile $trainpref.forward | tee $OUT/data_bin.log
 
 # preprocess test
 python preprocess.py \
@@ -38,7 +37,6 @@ $common_params \
 $copy_params \
 --testpref $testpref \
 --destdir $DATA_RAW \
---output-format raw
-# | tee $OUT/data_raw.log
+--output-format raw | tee $OUT/data_raw.log
 
 mv $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.src.old
