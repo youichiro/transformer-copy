@@ -29,7 +29,7 @@ for epoch in {1..9}; do
     --validpref $validpref \
     --destdir $destdir \
     --output-format binary \
-    --alignfile $trainpref.forward \
-    | tee $destdir.log
+    --alignfile $trainpref.forward
+    # | tee $destdir.log
 
 done
