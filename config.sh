@@ -16,6 +16,7 @@ CORPUS_PREF='bccwj'
 TRAIN_PREF='lang8_unidic.train'
 VALID_PREF='lang8_unidic.dev'
 TEST_PREF='naist_clean_unidic'
+M2_FILE='naist_clean_char.m2'
 DICT='dict_ja.src.txt'
 DATA_ART="data_ja_art/$CORPUS_PREF"
 

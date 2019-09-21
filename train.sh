@@ -2,7 +2,7 @@
 source ./config.sh
 
 mkdir $MODELS
-pretrained_model=./out_ja/models_pretrain/checkpoint9.pt
+pretrained_model=./out_ja/models_pretrain_bccwj/checkpoint9.pt
 
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
 --save-dir $MODELS \

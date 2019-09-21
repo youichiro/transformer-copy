@@ -12,7 +12,7 @@ cp $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.tgt
 
 epochs='_last'
 for epoch in ${epochs[*]}; do
-    if [ -f $RESULT/m2score$ema$exp_$epoch.log ]; then
+    if [ -f $RESULT/m2score$ema$exp_$epoch.log ] && [ -f $RESULT/m2score$ema$exp_$epoch.char.log ]; then
         continue
     fi
     echo $epoch
@@ -38,6 +38,13 @@ for epoch in ${epochs[*]}; do
 
     python2 ./gec_scripts/m2scorer/m2scorer -v $RESULT/output$ema$epoch.txt $DATA/$TEST_PREF.m2 > $RESULT/m2score$ema$exp_$epoch.log
     tail -n 1 $RESULT/m2score$ema$exp_$epoch.log
+
+    # 文字分割でもM2スコアを計算する
+    python ./gec_scripts/tokenize_character.py -f $RESULT/output$ema$epoch.txt -o $RESULT/output$ema$epoch.char.txt
+    python2 ./gec_scripts/m2scorer/m2scorer -v $RESULT/output$ema$epoch.char.txt $DATA/$M2_FILE > $RESULT/m2score$ema$exp_$epoch.char.log
+    tail -n 1 $RESULT/m2score$ema$exp_$epoch.char.log
+
 done
 
 python gec_scripts/show_m2.py $RESULT/m2score$ema$exp_{}.log
+python gec_scripts/show_m2.py $RESULT/m2score$ema$exp_{}.char.log
