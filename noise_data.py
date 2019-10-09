@@ -102,7 +102,7 @@ def save_file(filename, contents):
 
 # make noise from filename
 def noise(filename, ofile_suffix):
-    lines = open(filename).readlines()
+    lines = open(filename, encoding='utf-8', errors='ignore').readlines()
     tgts = [tokenize_line(line.strip()) for line in lines]
     noise_injector = NoiseInjector(tgts)
 

@@ -10,22 +10,25 @@ if [ $# -ge 2 ]; then
     exp=$2
 fi
 
-DATA='data_ja'
-OUT='out_ja'
-CORPUS_PREF='bccwj'
+DATA='data'
+OUT='out'
+
+PRETRAIN_CORPUS='bccwj_clean_unidic'
+TRAIN_CORPUS='lang8_unidic'
+TEST_CORPUS='naist_unidic'
 TRAIN_PREF='lang8_unidic.train'
 VALID_PREF='lang8_unidic.dev'
 TEST_PREF='naist_clean_unidic'
-M2_FILE='naist_clean_char.m2'
-DICT='dict_ja.src.txt'
-DATA_ART="data_ja_art/$CORPUS_PREF"
+DICT='dict_unidic.src.txt'
 
-DATA_BIN=$OUT/data_bin
-DATA_RAW=$OUT/data_raw
+M2_FILE='naist_clean_char.m2'
+DATA_ART=data_art/$PRETRAIN_CORPUS
+DATA_BIN=$OUT/data_bin/$TRAIN_CORPUS
+DATA_RAW=$OUT/data_raw/$TEST_CORPUS
 mkdir -p $DATA_BIN
 mkdir -p $DATA_RAW
 
-MODELS=$OUT/models$exp
-RESULT=$OUT/result$exp
+MODELS=$OUT/models/models$exp
+RESULT=$OUT/results/result$exp
 # mkdir -p $MODELS
 # mkdir -p $RESULT

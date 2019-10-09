@@ -584,9 +584,10 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 x = F.linear(x, self.embed_tokens.weight)
             else:
                 x = F.linear(x, self.embed_out)
-        
-        return x, {'attn': attn, 'inner_states': inner_states, 
-            'copy_attn': copy_attn, 'copy_alpha': copy_alpha, 'src_tokens': encoder_out['src_tokens']}
+
+        return x, {'attn': attn, 'inner_states': inner_states,
+            'copy_attn': copy_attn, 'copy_alpha': copy_alpha,
+            'src_tokens': encoder_out['src_tokens'], 'encoder_out': encoder_out['encoder_out']}
 
     def max_positions(self):
         """Maximum output length supported by the decoder."""

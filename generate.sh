@@ -3,14 +3,17 @@ source ./config.sh
 
 set -e
 
+# ema='ema'
+ema=''
+epochs='6'
+# epochs='_best'
+
 mkdir -p $RESULT
-ema='ema'
 
 rm -rf $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.tgt
 python gec_scripts/split.py $DATA_RAW/test.src-tgt.src.old $DATA_RAW/test.src-tgt.src $DATA_RAW/test.idx
 cp $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.tgt
 
-epochs='_last'
 for epoch in ${epochs[*]}; do
     if [ -f $RESULT/m2score$ema$exp_$epoch.log ] && [ -f $RESULT/m2score$ema$exp_$epoch.char.log ]; then
         continue
@@ -48,3 +51,6 @@ done
 
 python gec_scripts/show_m2.py $RESULT/m2score$ema$exp_{}.log
 python gec_scripts/show_m2.py $RESULT/m2score$ema$exp_{}.char.log
+
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish generate: ${exp}"
+

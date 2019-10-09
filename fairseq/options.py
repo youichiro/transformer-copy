@@ -239,6 +239,8 @@ def add_dataset_args(parser, train=False, gen=False):
                            help='don\'t shuffle batches for first N epochs')
         group.add_argument('--positive-label-weight', default=1, type=float, metavar='FP',
                            help='positive example loss weight')
+        group.add_argument('--token-labeling-loss-weight', default=0, type=float,
+                           help='token labeling loss weight')
     if gen:
         group.add_argument('--gen-subset', default='test', metavar='SPLIT',
                            help='data subset to generate (train, valid, test)')

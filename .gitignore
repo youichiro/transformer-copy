@@ -6,5 +6,6 @@ fairseq.egg-info
 build
 data/*
 data_*
+dicts/*
 out_*
 !.gitkeep

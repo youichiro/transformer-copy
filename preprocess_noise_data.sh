@@ -17,9 +17,9 @@ common_params="--source-lang src --target-lang tgt
 for epoch in {1..9}; do
     echo $epoch
 
-    trainpref=${DATA_ART}/${CORPUS_PREF}_$epoch
+    trainpref=${DATA_ART}/${PRETRAIN_CORPUS}_$epoch
     validpref=$DATA/$VALID_PREF
-    destdir=$OUT/data_bin_art/data_bin_art_$epoch
+    destdir=$OUT/data_bin_art/$PRETRAIN_CORPUS/data_bin_art_$epoch
 
     # preprocess train/valid
     python preprocess.py \
@@ -33,3 +33,6 @@ for epoch in {1..9}; do
     # | tee $destdir.log
 
 done
+
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish preprocess_noise_data: ${PRETRAIN_CORPUS}"
+

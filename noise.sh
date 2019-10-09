@@ -5,7 +5,7 @@ set -e
 set -x
 
 mkdir -p $DATA_ART
-corpus=$DATA/${CORPUS_PREF}.tgt
+corpus=$DATA/${PRETRAIN_CORPUS}.tgt
 
 # generate data with noise
 python noise_data.py -c $corpus -o $DATA_ART -e 1 -s 9182
@@ -17,3 +17,5 @@ python noise_data.py -c $corpus -o $DATA_ART -e 6 -s 1092
 python noise_data.py -c $corpus -o $DATA_ART -e 7 -s 10688
 python noise_data.py -c $corpus -o $DATA_ART -e 8 -s 50245
 python noise_data.py -c $corpus -o $DATA_ART -e 9 -s 71187
+
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish noising: ${PRETRAIN_CORPUS}"

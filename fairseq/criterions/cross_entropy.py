@@ -6,10 +6,10 @@
 # can be found in the PATENTS file in the same directory.
 
 import math
+import torch.nn as nn
 import torch.nn.functional as F
 
 from fairseq import utils
-
 from . import FairseqCriterion, register_criterion
 
 
@@ -41,7 +41,6 @@ class CrossEntropyCriterion(FairseqCriterion):
         return loss, sample_size, logging_output
 
     def compute_loss(self, model, net_output, sample, reduce=True):
-        
         if self.args.positive_label_weight != 1 \
             and sample is not None and sample.get('target_label', None) is not None:
             return self.compute_weighted_loss(model, net_output, sample, reduce=True)
@@ -53,21 +52,43 @@ class CrossEntropyCriterion(FairseqCriterion):
         return loss, loss
 
     def compute_weighted_loss(self, model, net_output, sample, reduce=True):
-        lprobs = model.get_normalized_probs(net_output, log_probs=True, sample=sample)
-        lprobs = lprobs.view(-1, lprobs.size(-1))
+        lprobs = model.get_normalized_probs(net_output, log_probs=True, sample=sample)  # 8 x 31 x 40031
+        lprobs = lprobs.view(-1, lprobs.size(-1))  # 248 x 40031
         target = model.get_targets(sample, net_output).view(-1)
-    
+
         target_label = sample['target_label'].view(-1).byte()
         neg_target = target.new_tensor(target).masked_fill_(target_label, self.padding_idx)
         pos_target = target.new_tensor(target).masked_fill_(1-target_label, self.padding_idx)
-       
+
         neg_loss = F.nll_loss(lprobs, neg_target, size_average=False, ignore_index=self.padding_idx,
                               reduce=reduce)
         pos_loss = F.nll_loss(lprobs, pos_target, size_average=False, ignore_index=self.padding_idx,
                               reduce=reduce)
 
         #loss = neg_loss + self.args.positive_label_weight * pos_loss
-        loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss 
+        loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss
+
+        """token-level multi-task learning"""
+        if self.args.token_labeling_loss_weight > 0:
+            assert 0 < self.args.token_labeling_loss_weight <= 1.0
+
+            # get encoder output hidden states
+            encoder_out = net_output[1]['encoder_out']  # 31 x 8 x 512
+            encoder_out = encoder_out.transpose(0, 1)  # 8 x 31 x 512
+
+            # Map to 1-dim
+            project_enc_out_dim = nn.Linear(encoder_out.size(-1), 1, bias=False)
+            encoder_out = project_enc_out_dim(encoder_out)  # 8 x 31 x 1
+            encoder_lprobs = F.log_softmax(encoder_out, dim=-1)  # 8 x 31 x 1
+            encoder_lprobs = encoder_lprobs.view(-1)  # 248
+
+            # calculate token labeling loss
+            source_label = sample['source_label'].view(-1).float()  # 248
+            label_loss = F.binary_cross_entropy_with_logits(encoder_lprobs, source_label, size_average=False, reduce=reduce)
+
+            # combine encoding loss with token labeling loss
+            label_weight = self.args.token_labeling_loss_weight
+            loss = (1 - label_weight) * loss + label_weight * label_loss
 
         return loss, loss
 

@@ -11,7 +11,7 @@ def main():
 
     data = open(args.f).readlines()
     with open(args.o, 'w') as f:
-        for line in tqdm(data):
+        for line in data:
             line = line.replace('\n', '').replace(' ', '')
             line = ' '.join(line)
             line = line.replace('< u n k >', '<unk>')
