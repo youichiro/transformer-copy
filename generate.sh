@@ -5,8 +5,7 @@ set -e
 
 # ema='ema'
 ema=''
-epochs='6'
-# epochs='_best'
+epochs='_best'
 
 mkdir -p $RESULT
 
