@@ -13,7 +13,7 @@ if [ -f $RESULT/m2score$exp.log ] && [ -f $RESULT/m2score$exp.char.log ]; then
   continue
 fi
 
-CUDA_VISIBLE_DVICES=$device python generatte.py $DATA_RAW \
+CUDA_VISIBLE_DVICES=$device python generate.py $DATA_RAW \
   --path $MODELS \
   --beam 12 \
   --nbest 12 \
