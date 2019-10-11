@@ -14,19 +14,19 @@ if [ -f $RESULT/m2score$exp.log ] && [ -f $RESULT/m2score$exp.char.log ]; then
 fi
 
 CUDA_VISIBLE_DVICES=$device python generatte.py $DATA_RAW \
---path $MODELS \
---beam 12 \
---nbest 12 \
---gen-subset test \
---max-tokens 6000 \
---no-progress-bar \
---raw-text \
---batch-size 32 \
---print-alignment \
---max-len-a 0 \
---no-early-stop \
---copy-ext-dict --replace-unk \
-> $RESULT/output.nbest.txt
+  --path $MODELS \
+  --beam 12 \
+  --nbest 12 \
+  --gen-subset test \
+  --max-tokens 6000 \
+  --no-progress-bar \
+  --raw-text \
+  --batch-size 32 \
+  --print-alignment \
+  --max-len-a 0 \
+  --no-early-stop \
+  --copy-ext-dict --replace-unk \
+  > $RESULT/output.nbest.txt
 
 cat $RESULT/output.nbest.txt | grep "^H" | python ./gec_scripts/sort.py 12 $RESULT/output.txt.split
 
