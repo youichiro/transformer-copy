@@ -3,8 +3,8 @@ source ./config.sh
 set -e
 
 MODELS=(\
-  $OUT/models/models_lang8_without_pretrain/checkpoint_best.pt \
-  $OUT/models/models_lang8_without_pretrain/checkpointema_last.pt \
+  $OUT/models/models_lang8_char_with_pretrain_bccwj_char/checkpoint_best.pt \
+  $OUT/models/models_lang8_char_with_pretrain_bccwj_char/checkpoint_last.pt \
 )
 MODELS=(`echo ${MODELS[@]}|tr ' ', ':'`)
 echo "models: $MODELS"
