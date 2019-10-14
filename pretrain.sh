@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 source ./config.sh
 
-data_epoch=5
+data_epoch=9
 DATA_BIN=$OUT/data_bin_art/$PRETRAIN_CORPUS/data_bin_art
 CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
   --save-dir $MODELS \
   --max-epoch $data_epoch \
-  --batch-size 4 \
+  --batch-size 8 \
   --max-tokens 3000 \
   --train-subset train \
   --valid-subset valid \
@@ -15,6 +15,7 @@ CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
   --lr 0.002 \
   --min-lr 1e-4 \
   --lr-shrink 0.999 \
+  --weight-decay 0.5 \
   --validate-interval 10 \
   --dropout 0.2 \
   --relu-dropout 0.2 \
@@ -32,7 +33,7 @@ CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
   --share-all-embeddings \
   --no-progress-bar \
   --log-interval 1000 \
-  --positive-label-weight 1.3 \
+  --positive-label-weight 3 \
   --no-ema \
   --skip-invalid-size-inputs-valid-test \
   --copy-attention \
