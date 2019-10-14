@@ -39,7 +39,6 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --share-all-embeddings \
   --copy-attention \
   --copy-attention-heads 1 \
-  --no-ema \
   --token-labeling-loss-weight 0.1 \
   | tee $OUT/log/log$exp.out
 
