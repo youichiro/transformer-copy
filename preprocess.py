@@ -149,7 +149,7 @@ def main(args):
 
         merge_result(
             Binarizer.binarize(
-                input_file, vocab, binarize_consumer,
+                input_file, vocab, binarize_consumer, reverse_order=args.reverse_order,
                 offset=0, end=offsets[1], copy_ext_dict=args.copy_ext_dict, copy_src_words=copy_src_words
             )
         )
@@ -310,7 +310,7 @@ def binarize(args, filename, vocab, output_prefix, lang, offset, end, append_eos
         words_list.append(words)
 
     res = Binarizer.binarize(filename, vocab, consumer, append_eos=append_eos,
-                             offset=offset, end=end)
+                             reverse_order=args.reverse_order, offset=offset, end=end)
     ds.finalize(dataset_dest_file(args, output_prefix, lang, "idx"))
     return res
 

@@ -210,6 +210,8 @@ def add_preprocess_args(parser):
                        help="number of parallel workers")
     group.add_argument("--copy-ext-dict", action="store_true",
                        help="Enable copy extended dictionary")
+    group.add_argument("--reverse-order", action="store_true",
+                       help="Enable reversed token order")
     # fmt: on
     return parser
 
