@@ -35,7 +35,8 @@ CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
   --positive-label-weight 1.3 \
   --no-ema \
   --skip-invalid-size-inputs-valid-test \
-  --copy-attention --copy-attention-heads 1 \
+  --copy-attention \
+  --copy-attention-heads 1 \
   | tee $OUT/log/log$exp${data_epoch}.out
 
   # --save-interval-updates 100000 \
