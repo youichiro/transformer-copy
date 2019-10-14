@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-source ./config_ensemble.sh
-
+source ./config.sh
 set -e
+
+MODELS=(\
+  $OUT/models/models_lang8_without_pretrain/checkpoint_best.pt \
+  $OUT/models/models_lang8_without_pretrain/checkpointema_last.pt \
+)
+MODELS=(`echo ${MODELS[@]}|tr ' ', ':'`)
+echo "models: $MODELS"
 
 mkdir -p $RESULT
 

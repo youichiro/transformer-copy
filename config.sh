@@ -30,5 +30,3 @@ mkdir -p $DATA_RAW
 
 MODELS=$OUT/models/models$exp
 RESULT=$OUT/results/result$exp
-# mkdir -p $MODELS
-# mkdir -p $RESULT
