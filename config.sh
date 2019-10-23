@@ -14,10 +14,10 @@ DATA='data'
 OUT='out'
 
 PRETRAIN_CORPUS='bccwj_unidic'
-TRAIN_CORPUS='lang8_uniq_unidic'
+TRAIN_CORPUS='lang8_unidic_dev'
 TEST_CORPUS='naist_unidic'
-TRAIN_PREF='lang8_uniq_unidic.train'
-VALID_PREF='lang8_uniq_unidic.dev'
+TRAIN_PREF='lang8_unidic.dev'
+VALID_PREF='lang8_unidic.dev'
 TEST_PREF='naist_clean_unidic'
 DICT='dict_unidic.src.txt'
 

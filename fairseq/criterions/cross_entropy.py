@@ -6,6 +6,7 @@
 # can be found in the PATENTS file in the same directory.
 
 import math
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -76,15 +77,16 @@ class CrossEntropyCriterion(FairseqCriterion):
             encoder_out = net_output[1]['encoder_out']  # 31 x 8 x 512
             encoder_out = encoder_out.transpose(0, 1)  # 8 x 31 x 512
 
-            # Map to 1-dim
-            project_enc_out_dim = nn.Linear(encoder_out.size(-1), 1, bias=False)
-            encoder_out = project_enc_out_dim(encoder_out)  # 8 x 31 x 1
-            encoder_lprobs = F.log_softmax(encoder_out, dim=-1)  # 8 x 31 x 1
-            encoder_lprobs = encoder_lprobs.view(-1)  # 248
+            # Map to 2-dim
+            project_enc_out_dim = nn.Linear(encoder_out.size(-1), 2, bias=True).cuda()
+            encoder_out = project_enc_out_dim(encoder_out)  # 8 x 31 x 2
+            encoder_lprobs = F.log_softmax(encoder_out)  # 8 x 31 x 2
+            encoder_lprobs = encoder_lprobs.view(-1, 2)  # 248 x 2
 
-            # calculate token labeling loss
-            source_label = sample['source_label'].view(-1).float()  # 248
-            label_loss = F.binary_cross_entropy_with_logits(encoder_lprobs, source_label, size_average=False, reduce=reduce)
+            # calculate token labeling loss with positive weight
+            source_label = sample['source_label'].view(-1).long()  # 248
+            weight = torch.tensor([1., self.args.token_labeling_positive_label_weight]).cuda()
+            label_loss = F.nll_loss(encoder_lprobs, source_label, weight=weight, size_average=False, reduce=reduce)
 
             # combine encoding loss with token labeling loss
             label_weight = self.args.token_labeling_loss_weight
