@@ -196,6 +196,8 @@ def train(args, trainer, task, epoch_itr):
 def get_training_stats(trainer):
     stats = collections.OrderedDict()
     stats['loss'] = trainer.get_meter('train_loss')
+    stats['dustribution_loss'] = trainer.get_meter('train_distribution_loss')
+    stats['label_loss'] = trainer.get_meter('train_label_loss')
     if trainer.get_meter('train_nll_loss').count > 0:
         nll_loss = trainer.get_meter('train_nll_loss')
         stats['nll_loss'] = nll_loss
