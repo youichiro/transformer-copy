@@ -69,7 +69,8 @@ class CrossEntropyCriterion(FairseqCriterion):
                               reduce=reduce)
 
         #loss = neg_loss + self.args.positive_label_weight * pos_loss
-        distribultion_loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss
+        distribution_loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss
+        loss = distribution_loss
 
         """token-level multi-task learning"""
         if self.args.token_labeling_loss_weight > 0:
@@ -92,21 +93,27 @@ class CrossEntropyCriterion(FairseqCriterion):
 
             # combine encoding loss with token labeling loss
             label_weight = self.args.token_labeling_loss_weight
-            loss = (1 - label_weight) * distribultion_loss + label_weight * label_loss
+            loss = (1 - label_weight) * distribution_loss + label_weight * label_loss
 
-        return loss, (1 - label_weight) * distribultion_loss, label_weight * label_loss
+            return loss, (1 - label_weight) * distribution_loss, label_weight * label_loss
 
+        else:
+            return loss, loss, loss
 
     @staticmethod
     def aggregate_logging_outputs(logging_outputs):
         """Aggregate logging outputs from data parallel training."""
         loss_sum = sum(log.get('loss', 0) for log in logging_outputs)
+        distribution_loss_sum = sum(log.get('distribution_loss', 0) for log in logging_outputs)
+        label_loss_sum = sum(log.get('label_loss', 0) for log in logging_outputs)
         ntokens = sum(log.get('ntokens', 0) for log in logging_outputs)
         nsentences = sum(log.get('nsentences', 0) for log in logging_outputs)
         sample_size = sum(log.get('sample_size', 0) for log in logging_outputs)
         copy_alpha = sum(log.get('copy_alpha', 0) for log in logging_outputs)
         agg_output = {
             'loss': loss_sum / sample_size / math.log(2),
+            'distribution_loss': distribution_loss_sum / sample_size / math.log(2),
+            'label_loss': label_loss_sum / sample_size / math.log(2),
             'ntokens': ntokens,
             'nsentences': nsentences,
             'sample_size': sample_size,
