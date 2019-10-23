@@ -60,6 +60,8 @@ class Trainer(object):
     def init_meters(self, args):
         self.meters = OrderedDict()
         self.meters['train_loss'] = AverageMeter()
+        self.meters['train_distribution_loss'] = AverageMeter()
+        self.meters['train_label_loss'] = AverageMeter()
         self.meters['train_nll_loss'] = AverageMeter()
         self.meters['valid_loss'] = AverageMeter()
         self.meters['valid_nll_loss'] = AverageMeter()
@@ -284,6 +286,8 @@ class Trainer(object):
                 1. if grad_norm > self.args.clip_norm and self.args.clip_norm > 0 else 0.
             )
             self.meters['train_loss'].update(logging_output.get('loss', 0), sample_size)
+            self.meters['train_distribution_loss'].update(logging_output.get('distribution_loss', 0), sample_size)
+            self.meters['train_label_loss'].update(logging_output.get('label_loss', 0), sample_size)
             if 'nll_loss' in logging_output:
                 self.meters['train_nll_loss'].update(logging_output.get('nll_loss', 0), ntokens)
         except OverflowError as e:

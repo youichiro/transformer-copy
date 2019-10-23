@@ -29,11 +29,13 @@ class CrossEntropyCriterion(FairseqCriterion):
         3) logging outputs to display while training
         """
         net_output = model(**sample['net_input'])
-        loss, _ = self.compute_loss(model, net_output, sample, reduce=reduce)
+        loss, distribution_loss, label_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.args.sentence_avg else sample['ntokens']
         copy_alpha = net_output[1]['copy_alpha'].mean().item() if net_output[1]['copy_alpha'] is not None else -1
         logging_output = {
             'loss': utils.item(loss.data) if reduce else loss.data,
+            'distribution_loss': utils.item(distribution_loss.data) if reduce else distribution_loss.data,
+            'label_loss': utils.item(label_loss.data) if reduce else label_loss.data,
             'ntokens': sample['ntokens'],
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
@@ -50,7 +52,7 @@ class CrossEntropyCriterion(FairseqCriterion):
         target = model.get_targets(sample, net_output).view(-1)
         loss = F.nll_loss(lprobs, target, size_average=False, ignore_index=self.padding_idx,
                           reduce=reduce)
-        return loss, loss
+        return loss, loss, loss
 
     def compute_weighted_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True, sample=sample)  # 8 x 31 x 40031
@@ -67,7 +69,7 @@ class CrossEntropyCriterion(FairseqCriterion):
                               reduce=reduce)
 
         #loss = neg_loss + self.args.positive_label_weight * pos_loss
-        loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss
+        distribultion_loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss
 
         """token-level multi-task learning"""
         if self.args.token_labeling_loss_weight > 0:
@@ -90,9 +92,9 @@ class CrossEntropyCriterion(FairseqCriterion):
 
             # combine encoding loss with token labeling loss
             label_weight = self.args.token_labeling_loss_weight
-            loss = (1 - label_weight) * loss + label_weight * label_loss
+            loss = (1 - label_weight) * distribultion_loss + label_weight * label_loss
 
-        return loss, loss
+        return loss, (1 - label_weight) * distribultion_loss, label_weight * label_loss
 
 
     @staticmethod
