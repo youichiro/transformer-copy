@@ -2,7 +2,8 @@
 source ./config.sh
 
 mkdir $MODELS
-pretrained_model=./out/models/models_pretrain_bccwj_clean_unidic/checkpoint5.pt
+pretrained_model=./out/models/models_pretrain_bccwj_char/checkpoint5.pt
+# pretrained_model=./out/models/models_pretrain_bccwj_clean_unidic/checkpoint5.pt
 
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --save-dir $MODELS \
@@ -26,18 +27,19 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --copy-attention-heads 1 \
   --no-progress-bar \
   --log-interval 1000 \
-  --positive-label-weight 1.3 \
   --share-all-embeddings \
   --copy-attention \
   --copy-attention-heads 1 \
-  --weight-decay 0.5 \
+  --weight-decay 0.0 \
   --no-ema \
-  --token-labeling-loss-weight 0.2 \
-  --token-labeling-positive-label-weight 3 \
+  --positive-label-weight 1.2 \
+  --token-labeling-loss-weight 0.1 \
+  --token-labeling-positive-label-weight 1.2 \
   | tee $OUT/log/log$exp.out
 
   # --pretrained-model $pretrained_model \
   # --token-labeling-loss-weight 0.1 \
+  # --token-labeling-positive-label-weight 3 \
 
 python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig: ${exp}"
 
