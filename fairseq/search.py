@@ -105,6 +105,7 @@ class TargetSearch(Search):
                 lprobs.view(bsz, -1).size(1) - 1,  # -1 so we never select pad
             ),
         )
+        import pdb; pdb.set_trace()
         torch.div(self.indices_buf, vocab_size, out=self.beams_buf)
         self.indices_buf.fmod_(vocab_size)
         return self.scores_buf, self.indices_buf, self.beams_buf
