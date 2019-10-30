@@ -30,15 +30,11 @@ python preprocess.py $common_params $copy_params \
   --alignfile $trainpref.forward \
   | tee $OUT/log/data_bin.log
 
-  # --reverse-order \
-
 # preprocess test
 python preprocess.py $common_params $copy_params \
   --testpref $testpref \
   --destdir $DATA_RAW \
   --output-format raw \
   | tee $OUT/log/data_raw.log
-
-  # --reverse-order \
 
 mv $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.src.old
