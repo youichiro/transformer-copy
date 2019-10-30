@@ -98,14 +98,12 @@ class TargetSearch(Search):
         else:
             lprobs.add_(scores[:, :, step - 1].unsqueeze(-1))
 
-        self.scores_buf, self.indices_buf = torch.topk(
-            lprobs.view(bsz, -1),
-            k=min(
-                beam_size * 2,
-                lprobs.view(bsz, -1).size(1) - 1,  # -1 so we never select pad
-            ),
-        )
-        import pdb; pdb.set_trace()
+        # self.scores_buf, self.indices_buf = torch.topk(lprobs.view(bsz, -1), 1)
+        indice = 11
+        self.scores_buf = lprobs.view(bsz, -1)[:, indice].view(-1, 1)  # (bsz x 1)
+        self.indices_buf = torch.LongTensor(bsz, 1).fill_(indice).cuda()  # (bsz x 1)
+        # import pdb; pdb.set_trace()
+
         torch.div(self.indices_buf, vocab_size, out=self.beams_buf)
         self.indices_buf.fmod_(vocab_size)
         return self.scores_buf, self.indices_buf, self.beams_buf
