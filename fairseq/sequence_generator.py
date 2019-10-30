@@ -106,7 +106,7 @@ class SequenceGenerator(object):
         sample,
         prefix_tokens=None,
         bos_token=None,
-        scorer=False
+        scorer=False,
         **kwargs
     ):
         """Generate a batch of translations.
