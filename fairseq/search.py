@@ -99,18 +99,15 @@ class TargetSearch(Search):
         else:
             lprobs.add_(scores[:, :, step - 1].unsqueeze(-1))
 
-        # self.scores_buf, self.indices_buf = torch.topk(lprobs.view(bsz, -1), 1)
-        # indice = 11
 
-        # target_idリスト
-        print(target_indices.shape)
-        print(step)
-        self.indices_buf = target_indices[:, step].view(-1, 1)  # (bsz x 1)
-        # lprobsからtarget_idの値だけを抽出
+        if step < target_indices.size(1):
+            # target indices
+            self.indices_buf = target_indices[:, step].view(-1, 1)  # (bsz x 1)
+        else:
+            # fill self.pad when step over the target sent. length
+            self.indices_buf = torch.LongTensor(bsz, 1).fill_(self.pad).cuda()
+        # select target indices
         self.scores_buf = lprobs.view(bsz, -1).gather(1, self.indices_buf)  # (bsz x 1)
-
-        # self.scores_buf = lprobs.view(bsz, -1)[:, indice].view(-1, 1)  # (bsz x 1)
-        # import pdb; pdb.set_trace()
 
         torch.div(self.indices_buf, vocab_size, out=self.beams_buf)
         self.indices_buf.fmod_(vocab_size)
