@@ -34,6 +34,7 @@ class SequenceGenerator(object):
         match_source_len=False,
         no_repeat_ngram_size=0,
         copy_ext_dict=False,
+        score_hypotheses=False,
     ):
         """Generates translations of a given source sentence.
 
@@ -87,6 +88,8 @@ class SequenceGenerator(object):
         self.copy_ext_dict = copy_ext_dict
 
         assert sampling_topk < 0 or sampling, '--sampling-topk requires --sampling'
+        if score_hypotheses:
+            assert beam_size == 1, '--score-hypotheses requires --beam-size 1'
 
         if sampling:
             self.search = search.Sampling(tgt_dict, sampling_topk, sampling_temperature)
@@ -96,6 +99,8 @@ class SequenceGenerator(object):
             self.search = search.LengthConstrainedBeamSearch(
                 tgt_dict, min_len_a=1, min_len_b=0, max_len_a=1, max_len_b=0,
             )
+        elif score_hypotheses:
+            self.search = search.TargetSearch(tgt_dict)
         else:
             self.search = search.BeamSearch(tgt_dict)
 
