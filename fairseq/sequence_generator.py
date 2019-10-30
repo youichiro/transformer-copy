@@ -382,6 +382,7 @@ class SequenceGenerator(object):
                         cand_indices[partial_prefix_mask] = partial_indices[partial_prefix_mask]
                         cand_beams[partial_prefix_mask] = partial_beams[partial_prefix_mask]
                 else:
+                    import pdb; pdb.set_trace()
                     cand_scores, cand_indices, cand_beams = self.search.step(
                         step,
                         lprobs.view(bsz, -1, self.vocab_size),
