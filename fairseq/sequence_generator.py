@@ -301,8 +301,44 @@ class SequenceGenerator(object):
         batch_idxs = None
 
         if scorer:
-            print('hoge')
-            import pdb; pdb.set_trace()
+            print('scoring sentence')
+            """
+            tokens: zeros(batch x len)
+            """
+            for step in range(max_len + 1):
+                lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs)
+                # lprobs: (batch x 40000)
+                lprobs[:, self.pad] = -math.inf
+                lprobs[:, self.unk] -= self.unk_penalty
+
+                # Record attention scores
+                if avg_attn_scores is not None:
+                    if attn is None:
+                        attn = scores.new(bsz, src_tokens.size(1), max_len + 2)
+                        attn_buf = attn.clone()
+                        nonpad_idxs = src_tokens.ne(self.pad)
+                    attn[:, :, step + 1].copy_(avg_attn_scores)
+
+                scores = scores.type_as(lprobs)
+                scores_buf = scores_buf.type_as(lprobs)
+                eos_bbsz_idx = buffer('eos_bbsz_idx')
+                eos_scores = buffer('eos_scores', type_of=scores)
+
+                if step < max_len:
+                    if prefix_tokens and step < prefix_tokens.size(1):
+                        probs_slice = lprobs.view(bsz, -1, lprobs.size(-1))[:, 0, :]
+                        cand_scores = torch.gather(
+                            probs_slice, dim=1,
+                            index=prefix_tokens[:, step].view(-1, 1)
+                        ).view(-1, 1).repeat(1, cand_size)
+                        if step > 0:
+                            # save cumulative scores for each hypothesis
+                            cand_scores.add_(scores[:, step - 1].view(bsz, beam_size).repeat(1, 2))
+                        cand_indices = prefix_tokens[:, step].view(-1, 1).repeat(1, cand_size)
+                        cand_beams = torch.zeros_like(cand_indices)
+
+                import pdb; pdb.set_trace()
+
 
         for step in range(max_len + 1):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
