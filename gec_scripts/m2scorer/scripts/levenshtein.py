@@ -22,7 +22,6 @@ from util import uniq
 import re
 import sys
 from copy import deepcopy
-from tqdm import tqdm
 
 # batch evaluation of a list of sentences
 def batch_precision(candidates, sources, gold_edits, max_unchanged_words=2, beta=0.5, ignore_whitespace_casing=False, verbose=False):
@@ -223,7 +222,7 @@ def batch_pre_rec_f1(candidates, sources, gold_edits, max_unchanged_words=2, bet
     stat_correct = 0.0
     stat_proposed = 0.0
     stat_gold = 0.0
-    for candidate, source, gold in zip(tqdm(candidates), sources, gold_edits):
+    for candidate, source, gold in zip(candidates, sources, gold_edits):
         candidate_tok = candidate.split()
         source_tok = source.split()
         lmatrix, backpointers = levenshtein_matrix(source_tok, candidate_tok)

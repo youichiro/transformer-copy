@@ -310,6 +310,8 @@ class SequenceGenerator(object):
 
             lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs)
 
+            import pdb; pdb.set_trace()
+
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
