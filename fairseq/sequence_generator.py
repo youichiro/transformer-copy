@@ -337,6 +337,14 @@ class SequenceGenerator(object):
                         cand_indices = prefix_tokens[:, step].view(-1, 1).repeat(1, cand_size)
                         cand_beams = torch.zeros_like(cand_indices)
 
+                    else:
+                        cand_scores, cand_indices, cand_beams = self.search.step(
+                            step,
+                            lprobs.view(bsz, -1, self.vocab_size),
+                            scores.view(bsz, beam_size, -1)[:, :, :step],
+                        )
+
+
                 import pdb; pdb.set_trace()
 
 
