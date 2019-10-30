@@ -106,6 +106,7 @@ class SequenceGenerator(object):
         sample,
         prefix_tokens=None,
         bos_token=None,
+        scorer=False
         **kwargs
     ):
         """Generate a batch of translations.
@@ -298,6 +299,11 @@ class SequenceGenerator(object):
 
         reorder_state = None
         batch_idxs = None
+
+        if scorer:
+            print('hoge')
+            import pdb; pdb.set_trace()
+
         for step in range(max_len + 1):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
