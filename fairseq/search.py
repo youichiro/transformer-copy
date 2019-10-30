@@ -89,7 +89,8 @@ class TargetSearch(Search):
     def __init__(self, tgt_dict):
         super().__init__(tgt_dict)
 
-    def step(self, step, lprobs, scores):
+    def step(self, step, lprobs, scores, target_indices):
+        # target_indices: (bsz x slen)
         super()._init_buffers(lprobs)
         bsz, beam_size, vocab_size = lprobs.size()
 
@@ -99,9 +100,16 @@ class TargetSearch(Search):
             lprobs.add_(scores[:, :, step - 1].unsqueeze(-1))
 
         # self.scores_buf, self.indices_buf = torch.topk(lprobs.view(bsz, -1), 1)
-        indice = 11
-        self.scores_buf = lprobs.view(bsz, -1)[:, indice].view(-1, 1)  # (bsz x 1)
-        self.indices_buf = torch.LongTensor(bsz, 1).fill_(indice).cuda()  # (bsz x 1)
+        # indice = 11
+
+        # target_idリスト
+        print(target_indices.shape)
+        print(step)
+        self.indices_buf = target_indices[:, step].view(-1, 1)  # (bsz x 1)
+        # lprobsからtarget_idの値だけを抽出
+        self.scores_buf = lprobs.view(bsz, -1).gather(1, self.indices_buf)  # (bsz x 1)
+
+        # self.scores_buf = lprobs.view(bsz, -1)[:, indice].view(-1, 1)  # (bsz x 1)
         # import pdb; pdb.set_trace()
 
         torch.div(self.indices_buf, vocab_size, out=self.beams_buf)

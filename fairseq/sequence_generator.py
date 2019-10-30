@@ -377,6 +377,7 @@ class SequenceGenerator(object):
                             step,
                             lprobs.view(bsz, -1, self.vocab_size),
                             scores.view(bsz, beam_size, -1)[:, :, :step],
+                            sample['target'],
                         )
                         cand_scores[partial_prefix_mask] = partial_scores[partial_prefix_mask]
                         cand_indices[partial_prefix_mask] = partial_indices[partial_prefix_mask]
@@ -387,6 +388,7 @@ class SequenceGenerator(object):
                         step,
                         lprobs.view(bsz, -1, self.vocab_size),
                         scores.view(bsz, beam_size, -1)[:, :, :step],
+                        sample['target']
                     )
             else:
                 # make probs contain cumulative scores for each hypothesis
