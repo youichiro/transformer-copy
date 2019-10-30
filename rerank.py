@@ -1,17 +1,4 @@
-#!/usr/bin/env python3 -u
-# Copyright (c) 2017-present, Facebook, Inc.
-# All rights reserved.
-#
-# This source code is licensed under the license found in the LICENSE file in
-# the root directory of this source tree. An additional grant of patent rights
-# can be found in the PATENTS file in the same directory.
-"""
-Translate pre-processed data with a trained model.
-"""
-
 import torch
-
-# from fairseq import bleu, options, progress_bar, tasks, tokenizer, utils
 from fairseq import options, progress_bar, tasks, tokenizer, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
 from fairseq.utils import import_user_module
@@ -90,12 +77,6 @@ def main(args):
     # Initialize generator
     gen_timer = StopwatchMeter()
     generator = task.build_generator(args)
-
-    # Generate and compute BLEU score
-    # if args.sacrebleu:
-    #     scorer = bleu.SacrebleuScorer()
-    # else:
-    #     scorer = bleu.Scorer(tgt_dict.pad(), tgt_dict.eos(), tgt_dict.unk())
 
     num_sentences = 0
     has_target = True
