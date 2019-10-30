@@ -70,6 +70,8 @@ class BeamSearch(Search):
             # make probs contain cumulative scores for each hypothesis
             lprobs.add_(scores[:, :, step - 1].unsqueeze(-1))
 
+        import pdb; pdb.set_trace()
+
         torch.topk(
             lprobs.view(bsz, -1),
             k=min(

@@ -307,7 +307,7 @@ class SequenceGenerator(object):
             """
             for step in range(max_len + 1):
                 lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs)
-                # lprobs: (batch x 40000)
+                # lprobs: (bsz x 40000)
                 lprobs[:, self.pad] = -math.inf
                 lprobs[:, self.unk] -= self.unk_penalty
 
@@ -340,9 +340,12 @@ class SequenceGenerator(object):
                     else:
                         cand_scores, cand_indices, cand_beams = self.search.step(
                             step,
-                            lprobs.view(bsz, -1, self.vocab_size),
-                            scores.view(bsz, beam_size, -1)[:, :, :step],
+                            lprobs.view(bsz, -1, self.vocab_size),  # (bsz x 40000) -> (bsz x 1 x 40000)
+                            scores.view(bsz, beam_size, -1)[:, :, :step],  # (bsz x len) -> (bsz x 1 x len)
                         )
+                        """
+                        cand_scores: (batch x )
+                        """
 
 
                 import pdb; pdb.set_trace()
@@ -359,8 +362,6 @@ class SequenceGenerator(object):
                 model.reorder_encoder_out(encoder_outs, reorder_state)
 
             lprobs, avg_attn_scores = model.forward_decoder(tokens[:, :step + 1], encoder_outs)
-
-            import pdb; pdb.set_trace()
 
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
