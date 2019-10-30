@@ -112,6 +112,7 @@ def main(args):
 
             gen_timer.start()
             hypos = task.inference_step(generator, models, sample, prefix_tokens, scorer=False)
+            import pdb; pdb.set_trace()
             num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
             gen_timer.stop(num_generated_tokens)
 
