@@ -70,15 +70,22 @@ class BeamSearch(Search):
             # make probs contain cumulative scores for each hypothesis
             lprobs.add_(scores[:, :, step - 1].unsqueeze(-1))
 
-        torch.topk(
+        # torch.topk(
+        #     lprobs.view(bsz, -1),
+        #     k=min(
+        #         # Take the best 2 x beam_size predictions. We'll choose the first
+        #         # beam_size of these which don't predict eos to continue with.
+        #         beam_size * 2,
+        #         lprobs.view(bsz, -1).size(1) - 1,  # -1 so we never select pad
+        #     ),
+        #     out=(self.scores_buf, self.indices_buf),
+        # )
+        self.scores_buf, self.indices_buf = torch.topk(
             lprobs.view(bsz, -1),
             k=min(
-                # Take the best 2 x beam_size predictions. We'll choose the first
-                # beam_size of these which don't predict eos to continue with.
                 beam_size * 2,
-                lprobs.view(bsz, -1).size(1) - 1,  # -1 so we never select pad
-            ),
-            out=(self.scores_buf, self.indices_buf),
+                lprobs.view(bsz, -1).size(1) - 1,
+            )
         )
         torch.div(self.indices_buf, vocab_size, out=self.beams_buf)
         self.indices_buf.fmod_(vocab_size)
