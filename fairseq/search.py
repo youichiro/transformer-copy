@@ -58,7 +58,7 @@ class BeamSearch(Search):
     def __init__(self, tgt_dict):
         super().__init__(tgt_dict)
 
-    def step(self, step, lprobs, scores):
+    def step(self, step, lprobs, scores, target_indices=None):
         super()._init_buffers(lprobs)
         bsz, beam_size, vocab_size = lprobs.size()
 

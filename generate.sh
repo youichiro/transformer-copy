@@ -9,9 +9,8 @@ epochs='_last'
 
 mkdir -p $RESULT
 
-rm -rf $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.tgt
+rm $DATA_RAW/test.src-tgt.src
 python gec_scripts/split.py $DATA_RAW/test.src-tgt.src.old $DATA_RAW/test.src-tgt.src $DATA_RAW/test.idx
-cp $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.tgt
 
 for epoch in ${epochs[*]}; do
     if [ -f $RESULT/m2score$ema$exp_$epoch.log ] && [ -f $RESULT/m2score$ema$exp_$epoch.char.log ]; then

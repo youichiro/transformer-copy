@@ -38,3 +38,4 @@ python preprocess.py $common_params $copy_params \
   | tee $OUT/log/data_raw.log
 
 mv $DATA_RAW/test.src-tgt.src $DATA_RAW/test.src-tgt.src.old
+
