@@ -19,6 +19,8 @@ class CrossEntropyCriterion(FairseqCriterion):
 
     def __init__(self, args, task):
         super().__init__(args, task)
+        if args.token_labeling_loss_weight > 0:
+            self.project_enc_out_dim = nn.Linear(args.encoder_embed_dim, 2, bias=True).cuda()
 
     def forward(self, model, sample, reduce=True):
         """Compute the loss for the given sample.
@@ -81,8 +83,8 @@ class CrossEntropyCriterion(FairseqCriterion):
             encoder_out = encoder_out.transpose(0, 1)  # 8 x 31 x 512
 
             # Map to 2-dim
-            project_enc_out_dim = nn.Linear(encoder_out.size(-1), 2, bias=True).cuda()
-            encoder_out = project_enc_out_dim(encoder_out)  # 8 x 31 x 2
+            # project_enc_out_dim = nn.Linear(encoder_out.size(-1), 2, bias=True).cuda()
+            encoder_out = self.project_enc_out_dim(encoder_out)  # 8 x 31 x 2
             encoder_lprobs = F.log_softmax(encoder_out)  # 8 x 31 x 2
             encoder_lprobs = encoder_lprobs.view(-1, 2)  # 248 x 2
 
