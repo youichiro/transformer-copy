@@ -21,6 +21,9 @@ class CrossEntropyCriterion(FairseqCriterion):
         super().__init__(args, task)
         if args.token_labeling_loss_weight > 0:
             self.project_enc_out_dim = nn.Linear(args.encoder_embed_dim, 2, bias=True).cuda()
+        self.label_total = 0
+        self.label_acc = 0
+        self.n = 0
 
     def forward(self, model, sample, reduce=True):
         """Compute the loss for the given sample.
@@ -31,13 +34,14 @@ class CrossEntropyCriterion(FairseqCriterion):
         3) logging outputs to display while training
         """
         net_output = model(**sample['net_input'])
-        loss, distribution_loss, label_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
+        loss, distribution_loss, label_loss, label_acc = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.args.sentence_avg else sample['ntokens']
         copy_alpha = net_output[1]['copy_alpha'].mean().item() if net_output[1]['copy_alpha'] is not None else -1
         logging_output = {
             'loss': utils.item(loss.data) if reduce else loss.data,
             'distribution_loss': utils.item(distribution_loss.data) if reduce else distribution_loss.data,
             'label_loss': utils.item(label_loss.data) if reduce else label_loss.data,
+            'label_acc': label_acc,
             'ntokens': sample['ntokens'],
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
@@ -54,7 +58,7 @@ class CrossEntropyCriterion(FairseqCriterion):
         target = model.get_targets(sample, net_output).view(-1)
         loss = F.nll_loss(lprobs, target, size_average=False, ignore_index=self.padding_idx,
                           reduce=reduce)
-        return loss, loss, loss
+        return loss, loss, loss, loss
 
     def compute_weighted_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True, sample=sample)  # 8 x 31 x 40031
@@ -83,7 +87,6 @@ class CrossEntropyCriterion(FairseqCriterion):
             encoder_out = encoder_out.transpose(0, 1)  # 8 x 31 x 512
 
             # Map to 2-dim
-            # project_enc_out_dim = nn.Linear(encoder_out.size(-1), 2, bias=True).cuda()
             encoder_out = self.project_enc_out_dim(encoder_out)  # 8 x 31 x 2
             encoder_lprobs = F.log_softmax(encoder_out)  # 8 x 31 x 2
             encoder_lprobs = encoder_lprobs.view(-1, 2)  # 248 x 2
@@ -97,10 +100,22 @@ class CrossEntropyCriterion(FairseqCriterion):
             label_weight = self.args.token_labeling_loss_weight
             loss = (1 - label_weight) * distribution_loss + label_weight * label_loss
 
-            return loss, (1 - label_weight) * distribution_loss, label_weight * label_loss
+            # calculate accuracy of labeling
+            encoder_label = encoder_out.max(2)[1].view(-1)
+            self.label_total += len(source_label)
+            self.label_acc += int((encoder_label == source_label).sum())
+            label_acc = self.label_acc / self.label_total
+
+            # print predicted labels
+            # self.n += 1
+            # if self.n % 1000 == 0:
+            #     print('encoder_label:', encoder_label)
+            #     print('source_label: ', source_label)
+
+            return loss, (1 - label_weight) * distribution_loss, label_weight * label_loss, label_acc
 
         else:
-            return loss, loss, loss
+            return loss, loss, loss, loss
 
     @staticmethod
     def aggregate_logging_outputs(logging_outputs):
@@ -108,6 +123,7 @@ class CrossEntropyCriterion(FairseqCriterion):
         loss_sum = sum(log.get('loss', 0) for log in logging_outputs)
         distribution_loss_sum = sum(log.get('distribution_loss', 0) for log in logging_outputs)
         label_loss_sum = sum(log.get('label_loss', 0) for log in logging_outputs)
+        label_acc = logging_outputs[-1].get('label_acc', 0)
         ntokens = sum(log.get('ntokens', 0) for log in logging_outputs)
         nsentences = sum(log.get('nsentences', 0) for log in logging_outputs)
         sample_size = sum(log.get('sample_size', 0) for log in logging_outputs)
@@ -116,6 +132,7 @@ class CrossEntropyCriterion(FairseqCriterion):
             'loss': loss_sum / sample_size / math.log(2),
             'distribution_loss': distribution_loss_sum / sample_size / math.log(2),
             'label_loss': label_loss_sum / sample_size / math.log(2),
+            'label_acc': label_acc,
             'ntokens': ntokens,
             'nsentences': nsentences,
             'sample_size': sample_size,

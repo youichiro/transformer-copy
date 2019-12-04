@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 source ./config.sh
 
-data_epoch=9
-DATA_BIN=$OUT/data_bin_art/$PRETRAIN_CORPUS/data_bin_art
-CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
+DATA_BIN=out/data_bin_art/$PRETRAIN_CORPUS/data_bin_art
+
+data_epoch=2
+echo "data_epoch: ${data_epoch}"
+CUDA_VISIBLE_DEVICES=0,1 python train.py ${DATA_BIN}_${data_epoch} \
   --save-dir $MODELS \
   --max-epoch $data_epoch \
   --batch-size 8 \
@@ -33,15 +35,14 @@ CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_${data_epoch} \
   --share-all-embeddings \
   --no-progress-bar \
   --log-interval 1000 \
-  --positive-label-weight 3 \
   --no-ema \
   --skip-invalid-size-inputs-valid-test \
   --copy-attention \
   --copy-attention-heads 1 \
-  | tee $OUT/log/log$exp${data_epoch}.out
+  --positive-label-weight 3.0 \
+  | tee $OUT/log/log$exp_${data_epoch}.out
 
-  # --save-interval-updates 100000 \
+  # --token-labeling-loss-weight 0.1 \
+  # --token-labeling-positive-label-weight 5.0 \
 
-
-python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish pretraining: $PRETRAIN_CORPUS"
-
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish pretraining: [$data_epoch] $PRETRAIN_CORPUS"

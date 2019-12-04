@@ -13,13 +13,13 @@ fi
 DATA='data'
 OUT='out'
 
-PRETRAIN_CORPUS='bccwj_unidic'
-TRAIN_CORPUS='lang8_unidic'
-TEST_CORPUS='naist_unidic'
-TRAIN_PREF='lang8_unidic.train'
-VALID_PREF='lang8_unidic.dev'
-TEST_PREF='naist_clean_unidic'
-DICT='dict_unidic.src.txt'
+PRETRAIN_CORPUS='bccwj_char'
+TRAIN_CORPUS='lang8_char'
+TEST_CORPUS='naist_char'
+TRAIN_PREF='lang8_char.train'
+VALID_PREF='lang8_char.dev'
+TEST_PREF='naist_clean_uniq_char'
+DICT='dict_char.src.txt'
 
 M2_FILE='naist_clean_char.m2'
 DATA_ART=data_art/$PRETRAIN_CORPUS

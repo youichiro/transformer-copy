@@ -62,6 +62,7 @@ class Trainer(object):
         self.meters['train_loss'] = AverageMeter()
         self.meters['train_distribution_loss'] = AverageMeter()
         self.meters['train_label_loss'] = AverageMeter()
+        self.meters['train_label_acc'] = AverageMeter()
         self.meters['train_nll_loss'] = AverageMeter()
         self.meters['valid_loss'] = AverageMeter()
         self.meters['valid_nll_loss'] = AverageMeter()
@@ -288,6 +289,7 @@ class Trainer(object):
             self.meters['train_loss'].update(logging_output.get('loss', 0), sample_size)
             self.meters['train_distribution_loss'].update(logging_output.get('distribution_loss', 0), sample_size)
             self.meters['train_label_loss'].update(logging_output.get('label_loss', 0), sample_size)
+            self.meters['train_label_acc'].update(logging_output.get('label_acc', 0), sample_size)
             if 'nll_loss' in logging_output:
                 self.meters['train_nll_loss'].update(logging_output.get('nll_loss', 0), ntokens)
         except OverflowError as e:
