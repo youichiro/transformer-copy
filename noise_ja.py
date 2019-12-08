@@ -154,6 +154,7 @@ class NoiseInjector:
             words, plabels = f(words, plabels)
         return self.to_char(words)
 
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-c', '--chunked-corpus', default='data/bccwj_clean_unidic.chunk',
