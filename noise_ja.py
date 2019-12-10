@@ -54,7 +54,7 @@ class NoiseInjector:
         """単語リストを文字分割する"""
         return ' '.join(''.join(words))
 
-    def shuffle(self, chunks, plabels):
+    def shuffle(self, words, plabels, chunks):
         """文節の中で単語の順番をシャッフルする"""
         # chunks: [[今日, は], [いい, 天気], [です, ね]]
         if self.shuffle_sigma < 1e-6:
@@ -65,7 +65,8 @@ class NoiseInjector:
         for chunk in chunks:
             shuffle_key = [i + np.random.normal(loc=0, scale=self.shuffle_sigma) for i in range(len(chunk))]
             new_idx = np.argsort(shuffle_key)
-            new_chunk = [chunk[i] for i in new_idx]
+            # new_chunk = [chunk[i] for i in new_idx]
+            new_chunk = [words[ntoken:ntoken+len(chunk)][i] for i in new_idx]
             new_plabels = [plabels[ntoken:ntoken+len(chunk)][i] for i in new_idx]
             ret += new_chunk
             ret_plabels += new_plabels
@@ -79,24 +80,24 @@ class NoiseInjector:
         ret = []
         ret_plabels = []
         rnd = np.random.random(len(words))
-        for i, (w, plabel) in enumerate(zip(words, plabels)):
+        for i, (word, plabel) in enumerate(zip(words, plabels)):
             ratio = replace_p_ratio if plabel == 1 else replace_ratio
             if rnd[i] < ratio:
                 if np.random.random() < self.replace_p_choice_ratio:  # p_choice_ratioの確率で助詞セットから置換
                     # 助詞セットからランダムに置換
-                    pset = [p for p in self.pset if p != w]  # 自分自身を除く
+                    pset = [p for p in self.pset if p != word[1]]  # 自分自身を除く
                     rnd_p = pset[np.random.randint(len(pset))]
-                    ret.append(rnd_p)
+                    ret.append((-1, rnd_p))
                     ret_plabels.append(1)
                 else:
                     # vocabularyからランダムに置換
                     rnd_word = self.corpus[np.random.randint(len(self.corpus))]
-                    if rnd_word == w:
+                    if rnd_word == word[1]:
                         rnd_word = self.corpus[np.random.randint(len(self.corpus))]  # もう1回ランダム
-                    ret.append(rnd_word)
+                    ret.append((-1, rnd_word))
                     ret_plabels.append(0)
             else:
-                ret.append(w)
+                ret.append(word)
                 ret_plabels.append(plabel)
         return ret, ret_plabels
 
@@ -110,14 +111,14 @@ class NoiseInjector:
         rnd = np.random.random(len(words))
         for i, (word, plabel) in enumerate(zip(words, plabels)):
             ratio = delete_p_ratio if plabel == 1 else delete_ratio
-            is_included_okurikana = self.is_included_okurikana(word)
+            is_included_okurikana = self.is_included_okurikana(word[1])
             ratio = delete_okurikana_ratio if is_included_okurikana else ratio
             if rnd[i] < ratio:
                 if is_included_okurikana:
                     # 送り仮名を1文字削除する
                     drop_idx = np.random.randint(len(word) - 1) + 1  # 漢字を除くため 1 ~ (len(w)-1)
-                    dropped_word = ''.join([w for i, w in enumerate(word) if i != drop_idx])
-                    ret.append(dropped_word)
+                    dropped_word = ''.join([w for i, w in enumerate(word[1]) if i != drop_idx])
+                    ret.append((-1, dropped_word))
                 else:
                     continue
             ret.append(word)
@@ -135,24 +136,53 @@ class NoiseInjector:
                 if np.random.random() < self.add_p_choice_ratio:
                     # 助詞セットからランダムに挿入
                     rnd_p = self.pset[np.random.randint(len(self.pset))]
-                    ret.append(rnd_p)
+                    ret.append((-1, rnd_p))
                     ret_plabels.append(1)
                 else:
                     # vocabularyからランダムに挿入
                     rnd_word = self.corpus[np.random.randint(len(self.corpus))]
-                    ret.append(rnd_word)
+                    ret.append((-1, rnd_word))
                     ret_plabels.append(0)
             ret.append(word)
             ret_plabels.append(plabel)
         return ret, ret_plabels
 
+    def parse(self, pairs):
+        align = []
+        art = []
+        nchar = sum([len(w) for i, w in pairs])
+        char_pairs = []
+        # for i, w in pairs:
+        #     chars = ' '.join(w).split(' ')
+        #     for c in chars:
+        #         char_pairs.append((i, c))
+
+        sorted_pairs = sorted(pairs)
+        n = 0
+        for p in sorted_pairs:
+            chars = ' '.join(p[1]).split(' ')
+            
+
+        for si in range(nchar):
+            ti = char_pairs[si][0]
+            c = char_pairs[si][1]
+            art.append(c)
+            if ti >= 0:
+                align.append('{}-{}'.format(si, ti))
+        print(pairs)
+        print(char_pairs)
+        print(align)
+        print()
+        return art, align
+
     def inject_noise(self, words, plabels, chunks):
         funcs = [self.replace, self.delete, self.add]
         np.random.shuffle(funcs)
-        words, plabels = self.shuffle(chunks, plabels)
+        pairs = [(i, w) for (i, w) in enumerate(words)]
+        pairs, plabels = self.shuffle(pairs, plabels, chunks)
         for f in funcs:
-            words, plabels = f(words, plabels)
-        return self.to_char(words)
+            pairs, plabels = f(pairs, plabels)
+        return self.parse(pairs)
 
 
 def main():
@@ -189,12 +219,15 @@ def main():
 
     noise_injector = NoiseInjector(corpus, pset)
 
-    with open(ofile_prefix + '.src', 'w') as fs, open(ofile_prefix + '.tgt', 'w') as ft:
+    with open(ofile_prefix + '.src', 'w') as fs, \
+         open(ofile_prefix + '.tgt', 'w') as ft, \
+         open(ofile_prefix + '.forward', 'w') as fa:
         for words, plabels, chunks in zip(tqdm(corpus), plabel_list, chunk_corpus):
             tgt = noise_injector.to_char(words)
-            src = noise_injector.inject_noise(words, plabels, chunks)
-            fs.write(src + '\n')
+            src, align = noise_injector.inject_noise(words, plabels, chunks)
+            fs.write(' '.join(src) + '\n')
             ft.write(tgt + '\n')
+            fa.write(' '.join(align) + '\n')
 
 
 if __name__ == '__main__':
