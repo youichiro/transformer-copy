@@ -39,6 +39,7 @@ class NoiseInjector:
         self.delete_p_a, self.delete_p_b = self.solve_ab(delete_p_mean, delete_p_var)
         self.delete_okurikana_ratio=delete_okurikana_ratio
         # add
+        self.add_mean, self.add_var = add_mean, add_var
         self.add_a, self.add_b = self.solve_ab(delete_mean, delete_var)
         self.add_p_choice_ratio=add_p_choice_ratio
 
@@ -78,7 +79,7 @@ class NoiseInjector:
             'replace_mean': self.replace_mean,
             'replace_var': self.replace_var,
             'replace_p_mean': self.replace_p_mean,
-            'replace_p_var': self.replaec_p_var,
+            'replace_p_var': self.replace_p_var,
             'replace_p_choice_ratio': self.replace_p_choice_ratio,
             'delete_mean': self.delete_mean,
             'delete_var': self.delete_var,
@@ -276,7 +277,7 @@ def main():
     with open(ofile_prefix + '.params', 'w') as f:
         params = noise_injector.get_params()
         for k, v in params.items():
-            f.write(k + str(v) + '\n')
+            f.write(k + '=' + str(v) + '\n')
 
     with open(ofile_prefix + '.src', 'w') as fs, \
          open(ofile_prefix + '.tgt', 'w') as ft, \
