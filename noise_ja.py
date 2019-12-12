@@ -1,3 +1,4 @@
+import copy
 import regex
 import argparse
 import itertools
@@ -7,24 +8,37 @@ from tqdm import tqdm
 
 class NoiseInjector:
     def __init__(self, corpus, pset,
-                 shuffle_sigma=0.5,
-                 replace_mean=0.1, replace_var=0.03,
-                 replace_p_mean=0.3, replace_p_var=0.03,
-                 replace_p_choice_ratio=0.7,
-                 delete_mean=0.1, delete_var=0.03,
-                 delete_p_mean=0.15, delete_p_var=0.03,
-                 delete_okurikana_mean=0.2, delete_okurikana_var=0.03,
-                 add_mean=0.1, add_var=0.03,
-                 add_p_choice_ratio=0.7):
+                 shuffle_sigma=0.3,  # 0.5
+                 replace_mean=0.05,  # 0.1
+                 replace_var=0.03,  # 0.03
+                 replace_p_mean=0.1,  # 0.3
+                 replace_p_var=0.03,  # 0.03
+                 replace_p_choice_ratio=0.7,  # 0.7
+                 delete_mean=0.05,  # 0.1
+                 delete_var=0.03,  # 0.03
+                 delete_p_mean=0.1,  # 0.15
+                 delete_p_var=0.03,  # 0.03
+                 delete_okurikana_ratio=0.5,  # 0.7
+                 add_mean=0.05,  # 0.1
+                 add_var=0.03,  # 0.03
+                 add_p_choice_ratio=0.7):  # 0.7
         self.pset = pset
         self.corpus = self.to_word_list(corpus)
+        # shuffle
         self.shuffle_sigma = shuffle_sigma
+        # replace
+        self.replace_mean, self.replace_var = replace_mean, replace_var
+        self.replace_p_mean, self.replace_p_var = replace_p_mean, replace_p_var
         self.replace_a, self.replace_b = self.solve_ab(replace_mean, replace_var)
         self.replace_p_a, self.replace_p_b = self.solve_ab(replace_p_mean, replace_p_var)
         self.replace_p_choice_ratio = replace_p_choice_ratio
+        # delete
+        self.delete_mean, self.delete_var = delete_mean, delete_var
+        self.delete_p_mean, self.delete_p_var = delete_p_mean, delete_p_var
         self.delete_a, self.delete_b = self.solve_ab(delete_mean, delete_var)
         self.delete_p_a, self.delete_p_b = self.solve_ab(delete_p_mean, delete_p_var)
-        self.delete_okurikana_a, self.delete_okurikana_b = self.solve_ab(delete_okurikana_mean, delete_okurikana_var)
+        self.delete_okurikana_ratio=delete_okurikana_ratio
+        # add
         self.add_a, self.add_b = self.solve_ab(delete_mean, delete_var)
         self.add_p_choice_ratio=add_p_choice_ratio
 
@@ -54,6 +68,28 @@ class NoiseInjector:
         """単語リストを文字分割する"""
         return ' '.join(''.join(words))
 
+    @staticmethod
+    def parse_pairs(pairs):
+        return ' '.join([w for i, w in pairs])
+
+    def get_params(self):
+        return {
+            'shuffle_sigma': self.shuffle_sigma,
+            'replace_mean': self.replace_mean,
+            'replace_var': self.replace_var,
+            'replace_p_mean': self.replace_p_mean,
+            'replace_p_var': self.replaec_p_var,
+            'replace_p_choice_ratio': self.replace_p_choice_ratio,
+            'delete_mean': self.delete_mean,
+            'delete_var': self.delete_var,
+            'delete_p_mean': self.delete_p_mean,
+            'delete_p_var': self.delete_p_var,
+            'delete_okurikana_ratio': self.delete_okurikana_ratio,
+            'add_mean': self.add_mean,
+            'add_var': self.add_var,
+            'add_p_choice_ratio': self.add_p_choice_ratio,
+        }
+
     def shuffle(self, words, plabels, chunks):
         """文節の中で単語の順番をシャッフルする"""
         # TODO: 。はシャッフルしない
@@ -66,7 +102,6 @@ class NoiseInjector:
         for chunk in chunks:
             shuffle_key = [i + np.random.normal(loc=0, scale=self.shuffle_sigma) for i in range(len(chunk))]
             new_idx = np.argsort(shuffle_key)
-            # new_chunk = [chunk[i] for i in new_idx]
             new_chunk = [words[ntoken:ntoken+len(chunk)][i] for i in new_idx]
             new_plabels = [plabels[ntoken:ntoken+len(chunk)][i] for i in new_idx]
             ret += new_chunk
@@ -106,20 +141,20 @@ class NoiseInjector:
         """(1)助詞の削除の割合を多くする (2)送り仮名の削除の割合を多くする"""
         delete_ratio = np.random.beta(self.delete_a, self.delete_b)
         delete_p_ratio = np.random.beta(self.delete_p_a, self.delete_p_b)  # 助詞に対しての確率
-        delete_okurikana_ratio = np.random.beta(self.delete_okurikana_a, self.delete_okurikana_b)  # 送り仮名に対しての確率
         ret = []
         ret_plabels = []
         rnd = np.random.random(len(words))
         for i, (word, plabel) in enumerate(zip(words, plabels)):
             ratio = delete_p_ratio if plabel == 1 else delete_ratio
             is_included_okurikana = self.is_included_okurikana(word[1])
-            ratio = delete_okurikana_ratio if is_included_okurikana else ratio
+            ratio = self.delete_okurikana_ratio if is_included_okurikana else ratio
             if rnd[i] < ratio:
                 if is_included_okurikana:
-                    # 送り仮名を1文字削除する
-                    drop_idx = np.random.randint(len(word) - 1) + 1  # 漢字を除くため 1 ~ (len(w)-1)
-                    dropped_word = ''.join([w for i, w in enumerate(word[1]) if i != drop_idx])
+                    # 漢字の直後の送り仮名を1文字削除する
+                    dropped_word = word[1][0] + word[1][2:]
                     ret.append((-1, dropped_word))
+                    ret_plabels.append(plabel)
+                    continue
                 else:
                     continue
             ret.append(word)
@@ -179,13 +214,23 @@ class NoiseInjector:
                 align.append('{}-{}'.format(si, ti))
         return art, align
 
-    def inject_noise(self, words, plabels, chunks):
+    def inject_noise(self, words, plabels, chunks, show=False):
         funcs = [self.replace, self.delete, self.add]
         np.random.shuffle(funcs)
         pairs = [(i, w) for (i, w) in enumerate(words)]
-        pairs, plabels = self.shuffle(pairs, plabels, chunks)
-        for f in funcs:
-            pairs, plabels = f(pairs, plabels)
+        origin_pairs = copy.deepcopy(pairs)
+
+        # 必ず編集させる
+        while pairs == origin_pairs:
+            pairs, plabels = self.shuffle(pairs, plabels, chunks)
+            for f in funcs:
+                pairs, plabels = f(pairs, plabels)
+
+        if show:
+            print(self.parse_pairs(origin_pairs))
+            print(self.parse_pairs(pairs))
+            print()
+
         return self.parse(pairs)
 
 
@@ -199,6 +244,7 @@ def main():
     parser.add_argument('-o', '--output-dir', default='data_art/ja_bccwj_clean', help='output directory')
     parser.add_argument('-e', '--epoch', type=int, default=10, help='epoch')
     parser.add_argument('-s', '--seed', type=int, default=2468, help='seed value')
+    parser.add_argument('--show', default=False, action='store_true', help='show input and output')
     args = parser.parse_args()
     np.random.seed(args.seed)
 
@@ -206,16 +252,19 @@ def main():
     filename = args.output_dir.split('/')[-1]
     ofile_prefix = f"{args.output_dir}/{filename}_{args.epoch}"
 
+    # prepare corpus
     lines = open(args.chunked_corpus, encoding='utf-8').readlines()
     chunk_corpus = [[chunk.split(' ') for chunk in line.replace('\n', '').split('|')] for line in lines]
-    # chunk_corpus: [[[今日, は], [いい, 天気], [です, ね]], ...]
+        # chunk_corpus: [[[今日, は], [いい, 天気], [です, ね]], ...]
     corpus = [line.replace('\n', '').replace('|', ' ').split(' ') for line in lines]
-    # corpus: [[今日, は, いい, 天気, です, ね], ...]
+        # corpus: [[今日, は, いい, 天気, です, ね], ...]
 
+    # prepare plabels
     lines = open(args.plabel_file, encoding='utf-8').readlines()
     plabel_list = [[int(i) for i in line.replace('\n', '').split(' ')] for line in lines]
-    # plabel_list: [[0, 1, 0, 0, 1, 0], ...]
+        # plabel_list: [[0, 1, 0, 0, 1, 0], ...]
 
+    # prepare pset
     lines = open(args.pset_file, encoding='utf-8').readlines()
     pset = [line.replace('\n', '') for line in lines]
 
@@ -223,12 +272,18 @@ def main():
 
     noise_injector = NoiseInjector(corpus, pset)
 
+    # パラメータを保存する
+    with open(ofile_prefix + '.params', 'w') as f:
+        params = noise_injector.get_params()
+        for k, v in params.items():
+            f.write(k + str(v) + '\n')
+
     with open(ofile_prefix + '.src', 'w') as fs, \
          open(ofile_prefix + '.tgt', 'w') as ft, \
          open(ofile_prefix + '.forward', 'w') as fa:
         for words, plabels, chunks in zip(tqdm(corpus), plabel_list, chunk_corpus):
             tgt = noise_injector.to_char(words)
-            src, align = noise_injector.inject_noise(words, plabels, chunks)
+            src, align = noise_injector.inject_noise(words, plabels, chunks, args.show)
             fs.write(' '.join(src) + '\n')
             ft.write(tgt + '\n')
             fa.write(' '.join(align) + '\n')

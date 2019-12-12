@@ -7,7 +7,7 @@ set -x
 corpus='data/bccwj_clean_unidic.chunk'
 plabels='data/bccwj_clean_unidic.plabels'
 pset='dicts/pset.txt'
-data_art='data_art/ja_bccwj_clean_char'
+data_art='data_art/ja_bccwj_clean_char_1'
 
 mkdir -p $data_art
 
