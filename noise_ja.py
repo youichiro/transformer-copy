@@ -148,31 +148,34 @@ class NoiseInjector:
         return ret, ret_plabels
 
     def parse(self, pairs):
+        pairs = [(i, w, new_i) for new_i, (i, w) in enumerate(pairs)]
+        orig_idx = np.argsort([i for i, w, ni in pairs])
+        n = 0
+        char_pairs = []
+        for oi in orig_idx:
+            i, word, new_i = pairs[oi]
+            chars = ' '.join(word).split(' ')
+            tmp = [new_i]
+            for char in chars:
+                if i >= 0:
+                    tmp.append((n, char))
+                    n += 1
+                else:
+                    tmp.append((-1, char))
+            char_pairs.append(tmp)
+        char_pairs = sorted(char_pairs)
+        new_pairs = []
+        for p in char_pairs:
+            new_pairs += list(p[1:])
+
         align = []
         art = []
-        nchar = sum([len(w) for i, w in pairs])
-        char_pairs = []
-        # for i, w in pairs:
-        #     chars = ' '.join(w).split(' ')
-        #     for c in chars:
-        #         char_pairs.append((i, c))
-
-        sorted_pairs = sorted(pairs)
-        n = 0
-        for p in sorted_pairs:
-            chars = ' '.join(p[1]).split(' ')
-            
-
-        for si in range(nchar):
-            ti = char_pairs[si][0]
-            c = char_pairs[si][1]
+        for si in range(len(new_pairs)):
+            ti = new_pairs[si][0]
+            c = new_pairs[si][1]
             art.append(c)
             if ti >= 0:
                 align.append('{}-{}'.format(si, ti))
-        print(pairs)
-        print(char_pairs)
-        print(align)
-        print()
         return art, align
 
     def inject_noise(self, words, plabels, chunks):
