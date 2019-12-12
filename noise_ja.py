@@ -56,6 +56,7 @@ class NoiseInjector:
 
     def shuffle(self, words, plabels, chunks):
         """文節の中で単語の順番をシャッフルする"""
+        # TODO: 。はシャッフルしない
         # chunks: [[今日, は], [いい, 天気], [です, ね]]
         if self.shuffle_sigma < 1e-6:
             return list(itertools.chain.from_iterable(chunks))
