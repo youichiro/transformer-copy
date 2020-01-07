@@ -8,4 +8,5 @@ data/*
 data_*
 dicts/*
 out_*
+analysis
 !.gitkeep

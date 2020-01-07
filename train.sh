@@ -46,6 +46,10 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --positive-label-weight 1.2 \
   | tee $OUT/log/log$exp.out
 
+  # --copy-attention \
+  # --copy-attention-heads 1 \
+  # --copy-attention-dropout 0.2 \
+
   # --token-labeling-loss-weight 0.1 \
   # --token-labeling-positive-label-weight 5.0 \
   # --pretrained-model $pretrained_model \
