@@ -35,12 +35,14 @@ class CrossEntropyCriterion(FairseqCriterion):
         """
         net_output = model(**sample['net_input'])
         loss, distribution_loss, label_loss, label_acc = self.compute_loss(model, net_output, sample, reduce=reduce)
+        if label_loss != 0:
+            label_loss = utils.item(label_loss.data) if reduce else label_loss.data
         sample_size = sample['target'].size(0) if self.args.sentence_avg else sample['ntokens']
         copy_alpha = net_output[1]['copy_alpha'].mean().item() if net_output[1]['copy_alpha'] is not None else -1
         logging_output = {
             'loss': utils.item(loss.data) if reduce else loss.data,
             'distribution_loss': utils.item(distribution_loss.data) if reduce else distribution_loss.data,
-            'label_loss': utils.item(label_loss.data) if reduce else label_loss.data,
+            'label_loss': label_loss,
             'label_acc': label_acc,
             'ntokens': sample['ntokens'],
             'nsentences': sample['target'].size(0),
@@ -58,7 +60,7 @@ class CrossEntropyCriterion(FairseqCriterion):
         target = model.get_targets(sample, net_output).view(-1)
         loss = F.nll_loss(lprobs, target, size_average=False, ignore_index=self.padding_idx,
                           reduce=reduce)
-        return loss, loss, loss, loss
+        return loss, loss, 0, 0
 
     def compute_weighted_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True, sample=sample)  # 8 x 31 x 40031
@@ -66,8 +68,8 @@ class CrossEntropyCriterion(FairseqCriterion):
         target = model.get_targets(sample, net_output).view(-1)
 
         target_label = sample['target_label'].view(-1).byte()
-        neg_target = target.new_tensor(target).masked_fill_(target_label, self.padding_idx)
-        pos_target = target.new_tensor(target).masked_fill_(1-target_label, self.padding_idx)
+        neg_target = target.clone().detach().masked_fill_(target_label, self.padding_idx)
+        pos_target = target.clone().detach().masked_fill_(1-target_label, self.padding_idx)
 
         neg_loss = F.nll_loss(lprobs, neg_target, size_average=False, ignore_index=self.padding_idx,
                               reduce=reduce)
@@ -76,7 +78,6 @@ class CrossEntropyCriterion(FairseqCriterion):
 
         #loss = neg_loss + self.args.positive_label_weight * pos_loss
         distribution_loss = (1/self.args.positive_label_weight) * neg_loss + pos_loss
-        loss = distribution_loss
 
         """token-level multi-task learning"""
         if self.args.token_labeling_loss_weight > 0:
@@ -106,16 +107,10 @@ class CrossEntropyCriterion(FairseqCriterion):
             self.label_acc += int((encoder_label == source_label).sum())
             label_acc = self.label_acc / self.label_total
 
-            # print predicted labels
-            # self.n += 1
-            # if self.n % 1000 == 0:
-            #     print('encoder_label:', encoder_label)
-            #     print('source_label: ', source_label)
-
             return loss, (1 - label_weight) * distribution_loss, label_weight * label_loss, label_acc
 
         else:
-            return loss, loss, loss, loss
+            return distribution_loss, distribution_loss, 0, 0
 
     @staticmethod
     def aggregate_logging_outputs(logging_outputs):

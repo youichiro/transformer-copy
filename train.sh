@@ -1,16 +1,27 @@
 #!/usr/bin/env bash
 source ./config.sh
+set -u
+
+# memory watch
+memory_watch_running=`ps aux|grep ogawa|grep memory_watch.sh|grep -v color|grep -v grep`
+if [ -z "$memory_watch_running" ]; then
+  sh /lab/ogawa/scripts/server/memory_watch.sh &
+  mpid=$!
+  echo "| pid of memory_watch: ${mpid}"
+else
+  mpid=0
+  echo "| memory_watch.sh is running"
+fi
+
 
 mkdir $MODELS
-pretrained_model=./out/models/models_pretrain_bccwj_char/checkpoint5.pt
-# pretrained_model=./out/models/models_pretrain_bccwj_clean_unidic/checkpoint5.pt
-
+pretrained_model=./out/models/models_pretrain_backtrans_bccwj_clean2_char/checkpoint9.pt
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --save-dir $MODELS \
   --seed 4321 \
   --max-epoch 30 \
-  --batch-size 32 \
-  --max-tokens 3000 \
+  --batch-size 128 \
+  --max-tokens 300 \
   --train-subset train \
   --valid-subset valid \
   --arch transformer \
@@ -33,14 +44,15 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --weight-decay 0.0 \
   --no-ema \
   --positive-label-weight 1.2 \
-  --token-labeling-loss-weight 0.1 \
-  --token-labeling-positive-label-weight 5.0 \
-  --pretrained-model $pretrained_model \
   | tee $OUT/log/log$exp.out
 
   # --token-labeling-loss-weight 0.1 \
   # --token-labeling-positive-label-weight 5.0 \
   # --pretrained-model $pretrained_model \
 
-python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig: ${exp}"
+# finish
+if [ $mpid -ne 0 ]; then
+  python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig: ${exp}"
+  kill -9 $mpid
+fi
 

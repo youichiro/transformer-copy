@@ -7,11 +7,12 @@ set -x
 corpus='data/bccwj_clean_unidic.chunk'
 plabels='data/bccwj_clean_unidic.plabels'
 pset='dicts/pset.txt'
-data_art='data_art/ja_bccwj_clean_char_1'
+data_art='data_art/ja_bccwj_clean_char_2'
 
 mkdir -p $data_art
 
 python noise_ja.py -c $corpus -l $plabels -p $pset -o $data_art -e 1 -s 9182
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish noise_ja [1]"
 python noise_ja.py -c $corpus -l $plabels -p $pset -o $data_art -e 2 -s 78834
 python noise_ja.py -c $corpus -l $plabels -p $pset -o $data_art -e 3 -s 5101
 python noise_ja.py -c $corpus -l $plabels -p $pset -o $data_art -e 4 -s 33302

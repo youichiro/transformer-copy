@@ -1,46 +1,55 @@
 #!/usr/bin/env bash
-source ./config.sh
-
 set -e
+set -u
 
-ema=''
+if [ $# -ne 2 ]; then
+  echo "usage: python generate.sh <device> <exp>" 1>&2
+  exit 1
+fi
+
+device=$1
+exp=$2
+
+MODELS=out/models/models${exp}
+data_raws=('naist_clean_char' 'naist_clean_uniq_char')
 epochs=('_last' '_best')
 
-mkdir -p $RESULT
+GLEU='/lab/ogawa/tools/jfleg/eval/gleu.py'
 
-# rm $DATA_RAW/test.src-tgt.src
-python gec_scripts/split.py $DATA_RAW/test.src-tgt.src.old $DATA_RAW/test.src-tgt.src $DATA_RAW/test.idx
+for data_raw in ${data_raws[*]}; do
+  for epoch in ${epochs[*]}; do
+      echo -e "\n${data_raw} ${epoch}"
+      RESULT=out/results/result${exp}/${data_raw}
+      output_pref=$RESULT/output${epoch}
+      output_m2score=$RESULT/m2score${epoch}.char.log
+      mkdir -p $RESULT
 
-for epoch in ${epochs[*]}; do
-    if [ -f $RESULT/m2score$ema$exp_$epoch.log ] && [ -f $RESULT/m2score$ema$exp_$epoch.char.log ]; then
-        continue
-    fi
-    echo $epoch
+      CUDA_VISIBLE_DEVICES=$device python generate.py out/data_raw/${data_raw} \
+      --path $MODELS/checkpoint$epoch.pt \
+      --beam 12 \
+      --nbest 12 \
+      --gen-subset test \
+      --max-tokens 6000 \
+      --no-progress-bar \
+      --raw-text \
+      --batch-size 32 \
+      --print-alignment \
+      --max-len-a 0 \
+      --no-early-stop \
+      --copy-ext-dict --replace-unk \
+      > ${output_pref}.nbest.txt
 
-    CUDA_VISIBLE_DEVICES=$device python generate.py $DATA_RAW \
-    --path $MODELS/checkpoint$ema$epoch.pt \
-    --beam 12 \
-    --nbest 12 \
-    --gen-subset test \
-    --max-tokens 6000 \
-    --no-progress-bar \
-    --raw-text \
-    --batch-size 32 \
-    --print-alignment \
-    --max-len-a 0 \
-    --no-early-stop \
-    --copy-ext-dict --replace-unk \
-    > $RESULT/output$ema$epoch.nbest.txt
+      cat ${output_pref}.nbest.txt | grep "^H" | python ./gec_scripts/sort.py 12 ${output_pref}.txt
+      python ./gec_scripts/tokenize_character.py -f ${output_pref}.txt -o ${output_pref}.char.txt
+      python2 ./gec_scripts/m2scorer/m2scorer -v ${output_pref}.char.txt data/${data_raw}.m2 > $output_m2score
+      echo "[m2score]"
+      tail -n 3 $output_m2score
 
-    cat $RESULT/output$ema$epoch.nbest.txt | grep "^H" | python ./gec_scripts/sort.py 12 $RESULT/output$ema$epoch.txt.split
-    python ./gec_scripts/revert_split.py $RESULT/output$ema$epoch.txt.split $DATA_RAW/test.idx > $RESULT/output$ema$epoch.txt
-
-    # 文字分割でM2スコアを計算する
-    python ./gec_scripts/tokenize_character.py -f $RESULT/output$ema$epoch.txt -o $RESULT/output$ema$epoch.char.txt
-    python2 ./gec_scripts/m2scorer/m2scorer -v $RESULT/output$ema$epoch.char.txt $DATA/$M2_FILE > $RESULT/m2score$ema$epoch.char.log
-
-    tail $RESULT/m2score$ema$epoch.char.log
-
+      python $GLEU --hyp ${output_pref}.char.txt --src data/${data_raw}.src \
+        --ref data/${data_raw}.tgt > $RESULT/gleu${epoch}.char.log
+      echo "[GLEU]"
+      tail -n 1 $RESULT/gleu${epoch}.char.log
+  done
 done
 
 python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish generate: ${exp}"

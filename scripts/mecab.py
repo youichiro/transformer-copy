@@ -1,0 +1,1 @@
+/lab/ogawa/scripts/preprocessing/mecab.py

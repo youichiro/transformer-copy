@@ -67,7 +67,7 @@ class NoiseInjector:
     @staticmethod
     def to_char(words):
         """単語リストを文字分割する"""
-        return ' '.join(''.join(words))
+        return ' '.join(''.join(words)).split(' ')
 
     @staticmethod
     def parse_pairs(pairs):
@@ -235,6 +235,12 @@ class NoiseInjector:
         return self.parse(pairs)
 
 
+def is_short_or_long(chars, max_char, min_char):
+    if len(chars) > max_char or len(chars) < min_char:
+        return True
+    return False
+
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-c', '--chunked-corpus', default='data/bccwj_clean_unidic.chunk',
@@ -245,6 +251,8 @@ def main():
     parser.add_argument('-o', '--output-dir', default='data_art/ja_bccwj_clean', help='output directory')
     parser.add_argument('-e', '--epoch', type=int, default=10, help='epoch')
     parser.add_argument('-s', '--seed', type=int, default=2468, help='seed value')
+    parser.add_argument('--max-char', type=int, default=200, help='max num of char')
+    parser.add_argument('--min-char', type=int, default=5, help='min num of char')
     parser.add_argument('--show', default=False, action='store_true', help='show input and output')
     args = parser.parse_args()
     np.random.seed(args.seed)
@@ -285,8 +293,11 @@ def main():
         for words, plabels, chunks in zip(tqdm(corpus), plabel_list, chunk_corpus):
             tgt = noise_injector.to_char(words)
             src, align = noise_injector.inject_noise(words, plabels, chunks, args.show)
+            if is_short_or_long(tgt, args.max_char, args.min_char) \
+               or is_short_or_long(src, args.max_char, args.min_char):
+                continue
             fs.write(' '.join(src) + '\n')
-            ft.write(tgt + '\n')
+            ft.write(' '.join(tgt) + '\n')
             fa.write(' '.join(align) + '\n')
 
 
