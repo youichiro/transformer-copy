@@ -13,6 +13,21 @@ import torch.nn.functional as F
 from fairseq import utils
 
 
+@torch._jit_internal.weak_script
+def linear(input, weight, bias=None, is_cpu=True):
+    if input.dim() == 2 and bias is not None:
+        ret = torch.addmm(torch.jit._unwrap_optional(bias), input, weight.t())
+    else:
+        if is_cpu:
+            output = input.matmul(weight.t())
+        else:
+            output = input.matmul(weight.t().cuda())
+        if bias is not None:
+            output += torch.jit._unwrap_optional(bias)
+        ret = output
+    return ret
+
+
 class MultiheadAttention(nn.Module):
     """Multi-headed attention.
 
@@ -228,7 +243,7 @@ class MultiheadAttention(nn.Module):
         if bias is not None:
             bias = bias[start:end]
         is_cpu = weight.device.type == 'cpu'
-        return F.linear(input, weight, bias, is_cpu)
+        return linear(input, weight, bias, is_cpu)
 
     def reorder_incremental_state(self, incremental_state, new_order):
         """Reorder buffered internal state (for incremental generation)."""
@@ -252,3 +267,4 @@ class MultiheadAttention(nn.Module):
             'attn_state',
             buffer,
         )
+
