@@ -373,21 +373,23 @@ class SequenceGenerator(object):
                     # handle prefixes of different lengths
                     partial_prefix_mask = prefix_tokens[:, step].eq(self.pad)
                     if partial_prefix_mask.any():
+                        target = sample.get('target', None)
                         partial_scores, partial_indices, partial_beams = self.search.step(
                             step,
                             lprobs.view(bsz, -1, self.vocab_size),
                             scores.view(bsz, beam_size, -1)[:, :, :step],
-                            sample['target'],
+                            target,
                         )
                         cand_scores[partial_prefix_mask] = partial_scores[partial_prefix_mask]
                         cand_indices[partial_prefix_mask] = partial_indices[partial_prefix_mask]
                         cand_beams[partial_prefix_mask] = partial_beams[partial_prefix_mask]
                 else:
+                    target = sample.get('target', None)
                     cand_scores, cand_indices, cand_beams = self.search.step(
                         step,
                         lprobs.view(bsz, -1, self.vocab_size),
                         scores.view(bsz, beam_size, -1)[:, :, :step],
-                        sample['target']
+                        target,
                     )
             else:
                 # make probs contain cumulative scores for each hypothesis

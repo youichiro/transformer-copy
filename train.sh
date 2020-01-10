@@ -55,8 +55,8 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   # --pretrained-model $pretrained_model \
 
 # finish
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig: ${exp}"
 if [ $mpid -ne 0 ]; then
-  python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig: ${exp}"
   kill -9 $mpid
 fi
 

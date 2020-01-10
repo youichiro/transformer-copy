@@ -227,7 +227,8 @@ class MultiheadAttention(nn.Module):
         weight = weight[start:end, :]
         if bias is not None:
             bias = bias[start:end]
-        return F.linear(input, weight, bias)
+        is_cpu = weight.device.type == 'cpu'
+        return F.linear(input, weight, bias, is_cpu)
 
     def reorder_incremental_state(self, incremental_state, new_order):
         """Reorder buffered internal state (for incremental generation)."""
