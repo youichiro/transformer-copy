@@ -202,7 +202,7 @@ class Sampling(Search):
         self.sampling_topk = sampling_topk
         self.sampling_temperature = sampling_temperature
 
-    def step(self, step, lprobs, scores):
+    def step(self, step, lprobs, scores, target_indices=None):
         super()._init_buffers(lprobs)
         bsz, beam_size, vocab_size = lprobs.size()
 

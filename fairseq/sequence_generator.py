@@ -428,7 +428,6 @@ class SequenceGenerator(object):
                         mask=eos_mask[:, :beam_size],
                         out=eos_scores,
                     )
-                    
                     finalized_sents = finalize_hypos(step, eos_bbsz_idx, eos_scores, cand_scores)
                     num_remaining_sent -= len(finalized_sents)
 
