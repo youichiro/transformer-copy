@@ -98,6 +98,9 @@ class GECModel:
         self.tgt_dict = tgt_dict
         self.align_dict = align_dict
 
+        print('| finish loading')
+
+
     @staticmethod
     def text_clean(text):
         text = text.replace('\u3000', '')
