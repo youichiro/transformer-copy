@@ -133,7 +133,6 @@ class GECModel:
             text = text + '。'
         text = self.text_clean(text)
         text = ' '.join(text.replace(' ', ''))
-        print(text)
         text = text.replace('。', '。\n')
         lines = re.split('[\t\n]', text)
         lines = [line for line in lines if line]

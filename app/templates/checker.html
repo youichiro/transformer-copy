@@ -86,7 +86,7 @@
   function ajax(text) {
     return $.ajax({
       type: "GET",
-      url: "http://localhost:5002/api",
+      url: "{{ prefix }}/api",
       data: { "input_text": text },
       contentType: "application/JSON",
       dataType: "json",
