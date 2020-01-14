@@ -10,7 +10,7 @@ from flask_bootstrap import Bootstrap
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from gec_model import GECModel
 
-mode = 'local'  # ('local', 'docker')
+mode = 'docker'  # ('local', 'docker')
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
