@@ -36,7 +36,15 @@ def api():
     if not text:
         return ''
     res = gec_model.generate(text)
+    if mode == 'local':
+        check_result(res)
     return jsonify({'res': res})
+
+
+def check_result(res):
+    hypos = res[0]['hypos']
+    for hyp in hypos:
+        print(f"{hyp['score']}\t{hyp['hypo_raw']}")
 
 
 if __name__ == '__main__':
