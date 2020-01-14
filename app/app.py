@@ -2,6 +2,7 @@
 import os
 import sys
 import configparser
+from pprint import pprint
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_bootstrap import Bootstrap
@@ -9,7 +10,7 @@ from flask_bootstrap import Bootstrap
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from gec_model import GECModel
 
-mode = 'docker'  # ('local', 'docker')
+mode = 'local'  # ('local', 'docker')
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -35,16 +36,26 @@ def api():
     text = request.args.get('input_text')
     if not text:
         return ''
-    res = gec_model.generate(text)
-    if mode == 'local':
-        check_result(res)
-    return jsonify({'res': res})
+    lines = gec_model.sentence_split(text)
+    results = []
+    for line in lines:
+        res, best_hypo_raw = generate(line)
+        d = res[0]
+        d['best_hypo_raw'] = best_hypo_raw
+        results.append(d)
+    return jsonify({'res': results})
 
 
-def check_result(res):
-    hypos = res[0]['hypos']
-    for hyp in hypos:
-        print(f"{hyp['score']}\t{hyp['hypo_raw']}")
+def generate(sentence, times=4):
+    scores = []
+    for _ in range(times):
+        res = gec_model.generate(sentence)
+        hypos = res[0]['hypos']
+        for hypo in hypos:
+            scores.append([hypo['score'], hypo['hypo_raw']])
+    scores = sorted(scores, reverse=True)
+    best_hypo_raw = scores[0][1]
+    return res, best_hypo_raw
 
 
 if __name__ == '__main__':

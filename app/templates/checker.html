@@ -103,17 +103,10 @@
     ajax(text).done(function(result) {
       for (i in result["res"]) {
         var res = result["res"][i];
-        var src_raw = res["src_raw"];
-        var hypo_raw = res["hypos"][0]["hypo_raw"];
+        console.log(res)
+        var hypo_raw = res["best_hypo_raw"];
         var hypo = $("<div class='result-box'>" + hypo_raw + "</div>");
         $("#result").append(hypo);
-        /*
-        for (j in res["hypos"]) {
-            var hypo_raw = res["hypos"][j]["hypo_raw"];
-            var hypo = $("<p>" + hypo_raw + "</p><br>");
-            $("#result").append(hypo);
-        }
-        */
       }
     }).fail(function() {
       console.log("error");

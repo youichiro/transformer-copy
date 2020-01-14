@@ -1,4 +1,4 @@
-beam=1
+beam=12
 buffer_size=0
 copy_ext_dict=True
 cpu=True
@@ -28,7 +28,7 @@ memory_efficient_fp16=False
 min_len=1
 min_loss_scale=0.0001
 model_overrides='{}'
-nbest=1
+nbest=12
 no_beamable_mm=False
 no_early_stop=False
 no_progress_bar=True
