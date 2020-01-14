@@ -130,21 +130,23 @@ class GECModel:
         text = text.replace(' ', '')
         return text
 
-
-    def generate(self, text):
+    def sentence_split(self, text):
         if text[-1] != '。':
             text = text + '。'
         text = self.text_clean(text)
-        text = ' '.join(text.replace(' ', ''))
+        text = ' '.join(text.replace(' ', ''))  # 文字分割
         text = text.replace('。', '。\n')
-        lines = re.split('[\t\n]', text)
+        lines = re.split('[\t\n]', text)  # 文分割
         lines = [line for line in lines if line]
+        return lines
 
+
+    def generate(self, sentence):
         start_id = 0
         src_strs = []
         results = []
         res = []
-        for batch in make_batches(lines, self.args, self.task, self.max_positions):
+        for batch in make_batches([sentence], self.args, self.task, self.max_positions):
             src_tokens = batch.src_tokens
             src_lengths = batch.src_lengths
             src_strs.extend(batch.src_strs)
