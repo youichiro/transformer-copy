@@ -103,7 +103,6 @@
     ajax(text).done(function(result) {
       for (i in result["res"]) {
         var res = result["res"][i];
-        console.log(res)
         var hypo_raw = res["best_hypo_raw"];
         var hypo = $("<div class='result-box'>" + hypo_raw + "</div>");
         $("#result").append(hypo);
