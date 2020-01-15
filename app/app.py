@@ -37,16 +37,17 @@ def api():
     if not text:
         return ''
     lines = gec_model.sentence_split(text)
+    lines = [line for line in lines if line and line.replace(' ', '') != '。']
     results = []
     for line in lines:
-        res, best_hypo_raw = generate(line)
+        res, best_hypo_raw = generate(line, times=4, mode=mode)
         d = res[0]
         d['best_hypo_raw'] = best_hypo_raw
         results.append(d)
     return jsonify({'res': results})
 
 
-def generate(sentence, times=4):
+def generate(sentence, times, mode):
     scores = []
     for _ in range(times):
         res = gec_model.generate(sentence)
@@ -54,6 +55,8 @@ def generate(sentence, times=4):
         for hypo in hypos:
             scores.append([hypo['score'], hypo['hypo_raw']])
     scores = sorted(scores, reverse=True)
+    if mode == 'local':
+        pprint(scores)
     best_hypo_raw = scores[0][1]
     return res, best_hypo_raw
 

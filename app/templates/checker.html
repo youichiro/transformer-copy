@@ -1,48 +1,62 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}日本語誤りチェッカー{% endblock %}
+{% block title %}日本語文法誤りチェッカー{% endblock %}
 
 {% block styles %}
 {{ super() }}
 <style>
     html {
-        position: relative;
-        min-height: 100%;
+      position: relative;
+      min-height: 100%;
     }
     body {
-        margin-bottom: 120px;
-        height: auto;
-        height: 100%;
+      margin-bottom: 120px;
+      height: auto;
+      height: 100%;
     }
     #result {
-        display: flex;
-        flex-wrap: wrap;
+      display: flex;
+      flex-wrap: wrap;
     }
     .card-body-self {
-        margin-top: 20px;
-        background-color: aliceblue;
+      margin-top: 20px;
+      background-color: aliceblue;
     }
     .result-box {
-        margin: 10px;
-        padding: 10px;
+      margin: 10px;
+      padding: 10px;
+    }
+    .info {
+      margin-top: 30px;
+      color: gray;
+    }
+    .info-header {
+      padding: 10px 0;
+    }
+    .info-body {
+      padding: 10px;
+      border: solid 2px #f3f3f3;
+    }
+    .info-body ul li {
+      margin-bottom: 10px;
     }
     .footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 60px;
-        background-color: #f5f5f5;
-        text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 60px;
+      background-color: #f5f5f5;
+      text-align: center;
     }
     body>.container {
-        padding: 60px 15px 0;
+      padding: 60px 15px 0;
     }
     .container .text-muted {
-        margin: 20px 0;
+      margin: 20px 0;
     }
     .footer>.container {
-        padding-right: 15px;
-        padding-left: 15px;
+      padding-right: 15px;
+      padding-left: 15px;
     }
 </style>
 {% endblock %}
@@ -50,7 +64,7 @@
 
 {% block content %}
 <div class="container">
-  <h1>日本語誤りチェッカー</h1>
+  <h1>日本語文法誤りチェッカー</h1>
   <hr>
   <form>
     <div class="form-group">
@@ -68,6 +82,31 @@
     <div class="card-header">結果</div>
     <div class="card-body card-body-self">
       <div id="result"></div>
+    </div>
+  </div>
+
+  <div class="info" style="margin-top: 100px;">
+    <div class="info-header">注意事項</div>
+    <div class="info-body">
+      <ul>
+        <li>句点(。)または改行で文を区切ります。</li>
+        <li>数字は全て0に変換されます。</li>
+        <li>句読点(、。)と大カッコ(「 」)以外の記号は削除されます。</li>
+        <li>長い文章は結果が表示されないことがあります。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-header">入力例</div>
+    <div class="info-body">
+      <ul>
+        <li>質問を対応する。</li>
+        <li>メッセージを表示されます。</li>
+        <li>昨日は雨が降る。</li>
+        <li>アイコンをクリークする。</li>
+        <li>質問があたらお願いします。</li>
+      </ul>
     </div>
   </div>
 </div>
