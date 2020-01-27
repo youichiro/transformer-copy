@@ -126,12 +126,12 @@ def parse_args_and_arch(parser, input_args=None, parse_known=False):
 def get_parser(desc, default_task='translation'):
     # Before creating the true parser, we need to import optional user module
     # in order to eagerly import custom tasks, optimizers, architectures, etc.
-    usr_parser = argparse.ArgumentParser(add_help=False)
+    usr_parser = argparse.ArgumentParser(add_help=False, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     usr_parser.add_argument('--user-dir', default=None)
     usr_args, _ = usr_parser.parse_known_args()
     import_user_module(usr_args)
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # fmt: off
     parser.add_argument('--no-progress-bar', action='store_true', help='disable progress bar')
     parser.add_argument('--log-interval', type=int, default=1000, metavar='N',

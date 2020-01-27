@@ -12,7 +12,7 @@ exp=$2
 
 MODELS=out/models/models${exp}
 # data_raws=('naist_clean_char' 'naist_clean_uniq_char')
-data_raws=('naist_clean_char_reverse')
+data_raws=('naist_clean_char.reverse')
 epochs=('_last' '_best')
 
 GLEU='/lab/ogawa/tools/jfleg/eval/gleu.py'

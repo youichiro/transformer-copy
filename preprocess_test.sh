@@ -2,8 +2,8 @@
 set -e
 set -x
 
-TEST_CORPUS='naist_clean_uniq_pcorr_char'
-TEST_PREF='naist_clean_uniq_pcorr_char'
+TEST_CORPUS='naist_clean_char.reverse'
+TEST_PREF='naist_clean_char.reverse'
 DICT='dict_char.src.txt'
 DATA_RAW=out/data_raw/$TEST_CORPUS
 TEST_PREF=data/$TEST_PREF
