@@ -16,8 +16,8 @@ else
 fi
 
 
-DATA_BIN=out/data_bin_lm/bccwj_clean2_char
-MODELS=out/models_lm/bccwj_clean2_char
+DATA_BIN=out/data_bin_lm/lang8_char
+MODELS=out/models_lm/lang8_char
 
 
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
@@ -31,12 +31,10 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --min-lr 1e-08 \
   --tokens-per-sample 1024 --sample-break-mode none \
   --max-tokens 8192 --update-freq 16 \
-  --max-update 100 \
+  --max-update 50000 \
   --no-ema \
   --no-progress-bar \
   --log-interval 10 \
-  --max-epoch 1 \
-  # --batch-size 256 \
 
 # finish
 python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig LM"
