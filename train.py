@@ -71,7 +71,8 @@ def main(args, init_distributed=False):
     dummy_batch = task.dataset('train').get_dummy_batch(args.max_tokens, max_positions)
     oom_batch = task.dataset('train').get_dummy_batch(1, max_positions)
 
-    model.copy_pretrained_params(args)
+    if args.task == 'translation':
+        model.copy_pretrained_params(args)
 
     # Build trainer
     trainer = Trainer(args, task, model, criterion, dummy_batch, oom_batch)

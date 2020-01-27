@@ -550,7 +550,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 self_attn_mask=self.buffered_future_mask(x) if incremental_state is None else None,
             )
             inner_states.append(x)
-        
+
         copy_attn, copy_alpha = None, None
         if self.copy_attention:
             assert encoder_out is not None, \
@@ -587,7 +587,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         return x, {'attn': attn, 'inner_states': inner_states,
             'copy_attn': copy_attn, 'copy_alpha': copy_alpha,
-            'src_tokens': encoder_out['src_tokens'], 'encoder_out': encoder_out['encoder_out']}
+            'src_tokens': encoder_out['src_tokens'] if encoder_out else None,
+            'encoder_out': encoder_out['encoder_out'] if encoder_out else None}
 
     def max_positions(self):
         """Maximum output length supported by the decoder."""

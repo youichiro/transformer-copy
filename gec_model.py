@@ -141,6 +141,14 @@ class GECModel:
         return lines
 
 
+    @staticmethod
+    def add_best_hypo(d):
+        sorted_hypos = sorted(d['hypos'], key=lambda x:x['score'], reverse=True)
+        best_hypo = sorted_hypos[0]
+        d['best_hypo'] = best_hypo
+        return d
+
+
     def generate(self, sentence):
         start_id = 0
         src_strs = []
@@ -187,10 +195,11 @@ class GECModel:
                 d['hypos'].append({
                     'hypo_str': hypo_str,
                     'hypo_raw': hypo_str.replace(' ', ''),
-                    'score': round(hypo['score'], 4),
+                    'score': hypo['score'],
                     'positional_scores': positional_scores,
                     'alignment': alignment if self.args.print_alignment else None,
                 })
+            d = self.add_best_hypo(d)
             res.append(d)
 
         return res

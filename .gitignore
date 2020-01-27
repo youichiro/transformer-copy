@@ -9,4 +9,5 @@ data_*
 dicts/*
 out_*
 analysis
+.nfs*
 !.gitkeep
