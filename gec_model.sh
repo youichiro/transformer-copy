@@ -23,7 +23,8 @@ SAVE_DIR="out/results/result${EXP}/${TEST_PREF}/${RESULT}"
 SAVE_FILE="output${EPOCH}.char.txt"
 OUTPUT_M2_FILE="m2score${EPOCH}.char.txt"
 KENLM_DATA='/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.6gram.binary'
-KENLM_WEIGHT=0.0001
+KENLM_WEIGHT=0.0
+N_ROUND=1
 
 mkdir -p $SAVE_DIR
 
@@ -41,7 +42,8 @@ CUDA_VISIBLE_DEVICES=$DEVICE python gec_model.py \
   --save-dir $SAVE_DIR \
   --save-file $SAVE_FILE \
   --kenlm-data $KENLM_DATA \
-  --kenlm-weight $KENLM_WEIGHT
+  --kenlm-weight $KENLM_WEIGHT \
+  --n-round $N_ROUND
 
 echo "| calc M2score"
 python2 ./gec_scripts/m2scorer/m2scorer -v ${SAVE_DIR}/${SAVE_FILE} data/${TEST_PREF}.m2 > ${SAVE_DIR}/${OUTPUT_M2_FILE}
