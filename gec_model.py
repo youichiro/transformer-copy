@@ -38,7 +38,7 @@ def make_batches(lines, args, task, max_positions):
 
 
 class GECModel:
-    def __init__(self, model_path, data_raw, option_file, kenlm_data=None):
+    def __init__(self, model_path, data_raw, option_file, kenlm_data=None, kenlm_weight=0.0):
         input_args = open(option_file).readlines()
         input_args = [['--' + arg.split('=')[0], arg.split('=')[1].replace("'", '').strip()]
                      for arg in input_args]
@@ -97,6 +97,8 @@ class GECModel:
         if self.use_kenlm:
             from scripts.ken_lm import KenLM
             self.kenlm = KenLM(kenlm_data)
+            self.kenlm_weight = kenlm_weight
+            assert 0.0 <= self.kenlm_weight <= 1.0
 
         self.args = args
         self.task = task
@@ -159,11 +161,9 @@ class GECModel:
 
 
     def rerank_kenlm(self, d):
-        print(d['hypos'])
         for hypo in d['hypos']:
             score = self.kenlm.calc(hypo['hypo_str'])
-            hypo['score'] = hypo['score'] + score
-        print(d['hypos'])
+            hypo['score'] = hypo['score'] + self.kenlm_weight * score
         return d
 
 
@@ -234,8 +234,9 @@ if __name__ == '__main__':
     test_data = 'data/naist_clean_char.src'
     save_dir = 'out/results/result_lang8_char_with_pretrain_ja_bccwj_clean_char_2/naist_clean_char'
     kenlm_data = '/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.4gram.binary'
+    kenlm_weight = 0.5
 
-    model = GECModel(model_path, data_raw, option_file, kenlm_data=kenlm_data)
+    model = GECModel(model_path, data_raw, option_file, kenlm_data=kenlm_data, kenlm_weight=kenlm_weight)
     data = open(test_data).readlines()
 
     if model.use_kenlm:
