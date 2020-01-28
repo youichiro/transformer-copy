@@ -160,6 +160,11 @@ class GECModel:
         d['best_hypo'] = best_hypo
         return d
 
+    @staticmethod
+    def get_best_hypo(d):
+        assert 'best_hypo' in d.keys()
+        return d['best_hypo']['hypo_str']
+
 
     def rerank_kenlm(self, d):
         for hypo in d['hypos']:
@@ -227,6 +232,14 @@ class GECModel:
         return res
 
 
+    def run_generate(self, sentence, n_round=1):
+        for i in range(n_round):
+            print(i)
+            res = self.generate(sentence)
+            assert len(res) == 1
+            sentence = self.get_best_hypo(res[0])
+        return sentence
+
 
 def experiment():
     parser = argparse.ArgumentParser()
@@ -238,6 +251,7 @@ def experiment():
     parser.add_argument('--save-file', default='output_gecmodel_last.char.txt')
     parser.add_argument('--kenlm-data', type=str, default=None)
     parser.add_argument('--kenlm-weight', type=float, default=0.0)
+    parser.add_argument('--n-round', type=int, default=1)
     args = parser.parse_args()
 
     model = GECModel(args.model_path, args.data_raw, args.option_file,
@@ -247,10 +261,8 @@ def experiment():
     with open(args.save_dir + '/' + args.save_file, 'w') as f:
         for sentence in tqdm(data):
             sentence = sentence.replace('\n', '')
-            res = model.generate(sentence)
-            assert len(res) == 1
-            best_hypo = res[0]['best_hypo']['hypo_str']
-            f.write(best_hypo + '\n')
+            output = model.run_generate(sentence, args.n_round)
+            f.write(output + '\n')
 
 
 
