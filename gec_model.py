@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import argparse
 import itertools
 from collections import namedtuple
 from pprint import pprint
@@ -227,25 +228,23 @@ class GECModel:
 
 
 
-if __name__ == '__main__':
-    model_path = 'out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt'
-    data_raw = 'out/data_raw/naist_clean_char'
-    option_file = 'option_files/exp.txt'
-    test_data = 'data/naist_clean_char.src'
-    save_dir = 'out/results/result_lang8_char_with_pretrain_ja_bccwj_clean_char_2/naist_clean_char'
-    kenlm_data = '/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.4gram.binary'
-    kenlm_weight = 0.5
+def experiment():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model-path', required=True)
+    parser.add_argument('--data-raw', default='out/data_raw/naist_clean_char')
+    parser.add_argument('--option-file', default='option_files/exp.txt')
+    parser.add_argument('--test-data', default='data/naist_clean_char.src')
+    parser.add_argument('--save-dir', required=True)
+    parser.add_argument('--save-file', default='output_gecmodel_last.char.txt')
+    parser.add_argument('--kenlm_data', type=str, default=None)
+    parser.add_argument('--kenlm-weight', type=float, default=0.0)
+    args = parser.parse_args()
 
-    model = GECModel(model_path, data_raw, option_file, kenlm_data=kenlm_data, kenlm_weight=kenlm_weight)
-    data = open(test_data).readlines()
+    model = GECModel(args.model_path, args.data_raw, args.option_file,
+                     kenlm_data=args.kenlml_data, kenlm_weight=args.kenlm_weight)
+    data = open(args.test_data).readlines()
 
-    if model.use_kenlm:
-        save_file = 'output_gecmodel+kenlm_last.char.txt'
-    else:
-        save_file = 'output_gecmodel_last.char.txt'
-
-
-    with open(save_dir + '/' + save_file, 'w') as f:
+    with open(args.save_dir + '/' + args.save_file, 'w') as f:
         for sentence in tqdm(data):
             sentence = sentence.replace('\n', '')
             res = model.generate(sentence)
@@ -253,3 +252,7 @@ if __name__ == '__main__':
             best_hypo = res[0]['best_hypo']['hypo_str']
             f.write(best_hypo + '\n')
 
+
+
+if __name__ == '__main__':
+    experiment()
