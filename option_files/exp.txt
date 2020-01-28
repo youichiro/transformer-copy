@@ -1,0 +1,12 @@
+beam=12
+nbest=12
+gen-subset='test'
+max_tokens=6000
+no_progress_bar=True
+raw_text=True
+max_len_a=0
+max_len_b=200
+no_early_stop=False
+copy_ext_dict=True
+replace_unk=True
+batch_size=64

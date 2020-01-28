@@ -49,6 +49,7 @@ class GECModel:
         args.data = [data_raw]
         args.path = model_path
         import_user_module(args)
+        self.use_cuda = torch.cuda.is_available() and not args.cpu
 
         if args.buffer_size < 1:
             args.buffer_size = 1
@@ -59,7 +60,6 @@ class GECModel:
             '--sampling requires --nbest to be equal to --beam'
         assert not args.max_sentences or args.max_sentences <= args.buffer_size, \
             '--max-sentences/--batch-size cannot be larger than --buffer-size'
-        assert args.cpu is True
 
         print(args)
 
@@ -78,6 +78,8 @@ class GECModel:
                 beamable_mm_beam_size=None if args.no_beamable_mm else args.beam,
                 need_attn=args.print_alignment,
             )
+            if self.use_cuda:
+                model.cuda()
 
         generator = task.build_generator(args)
 
@@ -166,6 +168,7 @@ class GECModel:
                     'src_lengths': src_lengths,
                 },
             }
+            sample = utils.move_to_cuda(sample) if self.use_cuda else sample
             translations = self.task.inference_step(self.generator, self.models, sample)
             for i, (id, hypos) in enumerate(zip(batch.ids.tolist(), translations)):
                 src_tokens_i = utils.strip_pad(src_tokens[i], self.tgt_dict.pad())
@@ -209,17 +212,18 @@ class GECModel:
 if __name__ == '__main__':
     model_path = 'out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt'
     data_raw = 'out/data_raw/naist_clean_char'
-    option_file = 'app/model_options.txt'
+    option_file = 'option_files/exp.txt'
     test_data = 'data/naist_clean_char.src'
     save_dir = 'out/results/result_lang8_char_with_pretrain_ja_bccwj_clean_char_2/naist_clean_char'
 
     model = GECModel(model_path, data_raw, option_file)
     data = open(test_data).readlines()
 
-    with open(save_dir + '/output_gecmodel_last.char.txt') as f:
+    with open(save_dir + '/output_gecmodel_last.char.txt', 'w') as f:
         for sentence in tqdm(data):
             sentence = sentence.replace('\n', '')
             res = model.generate(sentence)
             assert len(res) == 1
             best_hypo = res[0]['best_hypo']['hypo_str']
             f.write(best_hypo + '\n')
+
