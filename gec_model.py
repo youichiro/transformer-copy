@@ -7,6 +7,7 @@ from pprint import pprint
 import emoji
 import regex
 import neologdn
+from tqdm import tqdm
 import torch
 from fairseq import options, tasks, utils
 from fairseq.sequence_generator import SequenceGenerator
@@ -204,3 +205,21 @@ class GECModel:
 
         return res
 
+
+if __name__ == '__main__':
+    model_path = 'out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt'
+    data_raw = 'out/data_raw/naist_clean_char'
+    option_file = 'app/model_options.txt'
+    test_data = 'data/naist_clean_char.src'
+    save_dir = 'out/results/result_lang8_char_with_pretrain_ja_bccwj_clean_char_2/naist_clean_char'
+
+    model = GECModel(model_path, data_raw, option_file)
+    data = open(test_data).readlines()
+
+    with open(save_dir + '/output_gecmodel_last.char.txt') as f:
+        for sentence in tqdm(data):
+            sentence = sentence.replace('\n', '')
+            res = model.generate(sentence)
+            assert len(res) == 1
+            best_hypo = res[0]['best_hypo']['hypo_str']
+            f.write(best_hypo + '\n')
