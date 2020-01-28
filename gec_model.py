@@ -236,12 +236,12 @@ def experiment():
     parser.add_argument('--test-data', default='data/naist_clean_char.src')
     parser.add_argument('--save-dir', required=True)
     parser.add_argument('--save-file', default='output_gecmodel_last.char.txt')
-    parser.add_argument('--kenlm_data', type=str, default=None)
+    parser.add_argument('--kenlm-data', type=str, default=None)
     parser.add_argument('--kenlm-weight', type=float, default=0.0)
     args = parser.parse_args()
 
     model = GECModel(args.model_path, args.data_raw, args.option_file,
-                     kenlm_data=args.kenlml_data, kenlm_weight=args.kenlm_weight)
+                     kenlm_data=args.kenlm_data, kenlm_weight=args.kenlm_weight)
     data = open(args.test_data).readlines()
 
     with open(args.save_dir + '/' + args.save_file, 'w') as f:
