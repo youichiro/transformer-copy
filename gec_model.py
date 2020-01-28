@@ -93,8 +93,8 @@ class GECModel:
         )
 
         # KenLM
-        self.use_lm = True if kenlm_data else False
-        if self.use_lm:
+        self.use_kenlm = True if kenlm_data else False
+        if self.use_kenlm:
             from scripts.ken_lm import KenLM
             self.kenlm = KenLM(kenlm_data)
 
@@ -218,7 +218,7 @@ class GECModel:
                     'positional_scores': positional_scores,
                     'alignment': alignment if self.args.print_alignment else None,
                 })
-            if self.use_lm:
+            if self.use_kenlm:
                 d = self.rerank_kenlm(d)
             d = self.add_best_hypo(d)
             res.append(d)
@@ -238,7 +238,13 @@ if __name__ == '__main__':
     model = GECModel(model_path, data_raw, option_file, kenlm_data=kenlm_data)
     data = open(test_data).readlines()
 
-    with open(save_dir + '/output_gecmodel_last.char.txt', 'w') as f:
+    if model.use_kenlm:
+        save_file = 'output_gecmodel+kenlm_last.char.txt'
+    else:
+        save_file = 'output_gecmodel_last.char.txt'
+
+
+    with open(save_dir + '/' + save_file, 'w') as f:
         for sentence in tqdm(data):
             sentence = sentence.replace('\n', '')
             res = model.generate(sentence)
