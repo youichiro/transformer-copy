@@ -12,17 +12,14 @@ exp=$2
 
 MODELS=(\
   out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
-  out/models/models_lang8_uniq_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
-  out/models/models_lang8_char_without_pretrain/checkpoint_last.pt \
-  out/models/models_lang8_char_with_pretrain_bccwj_char/checkpoint_last.pt \
-  out/models/models_lang8_uniq_char_with_pretrain_ja_bccwj_clean_char_2_ml/checkpoint_last.pt \
+  out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2_2nd/checkpoint_last.pt \
+  out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2_3rd/checkpoint_last.pt \
+  out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2_4th/checkpoint_last.pt \
 )
 MODELS=(`echo ${MODELS[@]}|tr ' ', ':'`)
 echo "| models: $MODELS"
 
-data_raws=('naist_clean_uniq_char' 'naist_clean_char')
-
-GLEU='/lab/ogawa/tools/jfleg/eval/gleu.py'
+data_raws=('naist_clean_char')
 
 
 for data_raw in ${data_raws[*]}; do
@@ -39,9 +36,9 @@ for data_raw in ${data_raws[*]}; do
   --nbest 12 \
   --gen-subset test \
   --max-tokens 6000 \
+  --batch-size 16 \
   --no-progress-bar \
   --raw-text \
-  --batch-size 16 \
   --print-alignment \
   --max-len-a 0 \
   --no-early-stop \
@@ -54,10 +51,6 @@ for data_raw in ${data_raws[*]}; do
   echo "[m2score]"
   tail -n 3 $output_m2score
 
-  python $GLEU --hyp ${output_pref}.char.txt --src data/${data_raw}.src \
-    --ref data/${data_raw}.tgt > $RESULT/gleu_ensemble.char.log
-  echo "[GLEU]"
-  tail -n 1 $RESULT/gleu_ensemble.char.log
 done
 
 

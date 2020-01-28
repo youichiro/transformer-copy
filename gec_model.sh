@@ -23,7 +23,7 @@ SAVE_DIR="out/results/result${EXP}/${TEST_PREF}/${RESULT}"
 SAVE_FILE="output${EPOCH}.char.txt"
 OUTPUT_M2_FILE="m2score${EPOCH}.char.txt"
 KENLM_DATA='/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.6gram.binary'
-KENLM_WEIGHT=0.01
+KENLM_WEIGHT=0.0001
 
 mkdir -p $SAVE_DIR
 
