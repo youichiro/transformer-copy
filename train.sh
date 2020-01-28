@@ -21,7 +21,7 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --seed 4321 \
   --max-epoch 30 \
   --batch-size 128 \
-  --max-tokens 300 \
+  --max-tokens 6000 \
   --train-subset train \
   --valid-subset valid \
   --arch transformer \
