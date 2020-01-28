@@ -38,7 +38,7 @@ def make_batches(lines, args, task, max_positions):
 
 
 class GECModel:
-    def __init__(self, model_path, data_raw, option_file):
+    def __init__(self, model_path, data_raw, option_file, kenlm_data=None):
         input_args = open(option_file).readlines()
         input_args = [['--' + arg.split('=')[0], arg.split('=')[1].replace("'", '').strip()]
                      for arg in input_args]
@@ -91,6 +91,12 @@ class GECModel:
             task.max_positions(),
             *[model.max_positions() for model in models]
         )
+
+        # KenLM
+        self.use_lm = True if kenlm_data else False
+        if self.use_lm:
+            from scripts.ken_lm import KenLM
+            self.kenlm = KenLM(kenlm_data)
 
         self.args = args
         self.task = task
@@ -152,6 +158,15 @@ class GECModel:
         return d
 
 
+    def rerank_kenlm(self, d):
+        print(d['hypos'])
+        for hypo in d['hypos']:
+            score = self.kenlm.calc(hypo['hypo_str'])
+            hypo['score'] = hypo['score'] + score
+        print(d['hypos'])
+        return d
+
+
     def generate(self, sentence):
         start_id = 0
         src_strs = []
@@ -203,10 +218,13 @@ class GECModel:
                     'positional_scores': positional_scores,
                     'alignment': alignment if self.args.print_alignment else None,
                 })
+            if self.use_lm:
+                d = self.rerank_kenlm(d)
             d = self.add_best_hypo(d)
             res.append(d)
 
         return res
+
 
 
 if __name__ == '__main__':
@@ -215,8 +233,9 @@ if __name__ == '__main__':
     option_file = 'option_files/exp.txt'
     test_data = 'data/naist_clean_char.src'
     save_dir = 'out/results/result_lang8_char_with_pretrain_ja_bccwj_clean_char_2/naist_clean_char'
+    kenlm_data = '/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.4gram.binary'
 
-    model = GECModel(model_path, data_raw, option_file)
+    model = GECModel(model_path, data_raw, option_file, kenlm_data=kenlm_data)
     data = open(test_data).readlines()
 
     with open(save_dir + '/output_gecmodel_last.char.txt', 'w') as f:
