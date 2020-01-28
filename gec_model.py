@@ -94,7 +94,7 @@ class GECModel:
         )
 
         # KenLM
-        self.use_kenlm = True if kenlm_data else False
+        self.use_kenlm = True if kenlm_data and kenlm_weight > 0.0 else False
         if self.use_kenlm:
             from scripts.ken_lm import KenLM
             self.kenlm = KenLM(kenlm_data)
