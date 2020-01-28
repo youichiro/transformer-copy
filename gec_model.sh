@@ -23,7 +23,7 @@ SAVE_DIR="out/results/result${EXP}/${TEST_PREF}/${RESULT}"
 SAVE_FILE="output${EPOCH}.char.txt"
 OUTPUT_M2_FILE="m2score${EPOCH}.char.txt"
 KENLM_DATA='/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.4gram.binary'
-KENLM_WEIGHT=0.5
+KENLM_WEIGHT=0.0
 
 mkdir -p $SAVE_DIR
 
@@ -38,7 +38,8 @@ CUDA_VISIBLE_DEVICES=$DEVICE python gec_model.py \
   --kenlm-data $KENLM_DATA \
   --kenlm-weight $KENLM_WEIGHT
 
-python2 ./gec_scripts/m2scorer/m2scorer -v ${SAVE_DIR}/${SAVE_FILE} data/${DATA_RAW}.m2 > ${SAVE_DIR}/${OUTPUT_M2_FILE}
+echo "| calc M2score"
+python2 ./gec_scripts/m2scorer/m2scorer -v ${SAVE_DIR}/${SAVE_FILE} data/${TEST_PREF}.m2 > ${SAVE_DIR}/${OUTPUT_M2_FILE}
 tail -n 3 ${SAVE_DIR}/${OUTPUT_M2_FILE}
 
 python /lab/ogawa/scripts/slack/send_slack_message.py -m "[${HOSTNAME}] Finish gec_model"
