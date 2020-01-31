@@ -256,6 +256,7 @@ def experiment():
         from lm_model import KenLM
         lm = KenLM(args.lm_data)
     elif args.lm == 'transformer_lm':
+        assert args.lm_dict is not None
         from lm_model import TransformerLM
         lm = TransformerLM(args.lm_data, args.lm_dict)
     else:
