@@ -40,7 +40,7 @@ def make_batches(lines, args, task, max_positions):
 
 
 class GECModel:
-    def __init__(self, model_path, data_raw, option_file, lm=None, lm_weight=0.0):
+    def __init__(self, model_path, data_raw, option_file, lm=None, lm_weight=0.0, print_hypos=False):
         input_args = open(option_file).readlines()
         input_args = [['--' + arg.split('=')[0], arg.split('=')[1].replace("'", '').strip()]
                      for arg in input_args]
@@ -102,6 +102,7 @@ class GECModel:
         self.src_dict = src_dict
         self.tgt_dict = tgt_dict
         self.align_dict = align_dict
+        self.print_hypos = print_hypos
         # LM
         self.lm = lm
         self.lm_weight = lm_weight
@@ -218,12 +219,14 @@ class GECModel:
                     'hypo_str': hypo_str,
                     'hypo_raw': hypo_str.replace(' ', ''),
                     'score': hypo['score'],
-                    'positional_scores': positional_scores,
-                    'alignment': alignment if self.args.print_alignment else None,
+                    # 'positional_scores': positional_scores,
+                    # 'alignment': alignment if self.args.print_alignment else None,
                 })
             if self.lm:
                 d = self.rerank_lm(d)
             d = self.add_best_hypo(d)
+            if self.print_hypos:
+                pprint(d)
             res.append(d)
 
         return res
@@ -245,11 +248,12 @@ def experiment():
     parser.add_argument('--test-data', default='data/naist_clean_char.src', help='test data')
     parser.add_argument('--save-dir', required=True, help='save dir')
     parser.add_argument('--save-file', default='output_gecmodel_last.char.txt', help='save file')
-    parser.add_argument('--lm', default=None, choices=['kenlm', 'transformer_lm'])
+    parser.add_argument('--lm', default=None, choices=['kenlm', 'transformer_lm'], help='choice lm')
     parser.add_argument('--lm-data', type=str, default=None, help='lm data')
     parser.add_argument('--lm-dict', type=str, default=None, help='transformerLM dict')
     parser.add_argument('--lm-weight', type=float, default=0.0, help='lm weight[0.0, 1.0]')
     parser.add_argument('--n-round', type=int, default=1, help='n-round')
+    parser.add_argument('--print-hypos', default=False, action='store_true', help='print hypos')
     args = parser.parse_args()
 
     if args.lm == 'kenlm':
@@ -263,7 +267,7 @@ def experiment():
         lm = None
 
     model = GECModel(args.model_path, args.data_raw, args.option_file,
-                     lm=lm, lm_weight=args.lm_weight)
+                     lm=lm, lm_weight=args.lm_weight, print_hypos=args.print_hypos)
     data = open(args.test_data).readlines()
 
     os.makedirs(args.save_dir, exist_ok=True)
