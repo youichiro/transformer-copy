@@ -30,6 +30,7 @@ class TransformerLM:
         parsed_args.cpu = True
         parsed_args.gen_subset = 'test'
         parsed_args.raw_text = True
+        parsed_args.no_progress_bar = True
         import_user_module(parsed_args)
         print(parsed_args)
 
