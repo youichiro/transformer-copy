@@ -41,7 +41,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE python gec_model.py \
   --test-data $TEST_DATA \
   --save-dir $SAVE_DIR \
   --save-file $SAVE_FILE \
-  --kenlm \
+  --lm kenlm \
   --lm-data $KENLM_DATA \
   --lm-weight $KENLM_WEIGHT \
   --n-round $N_ROUND

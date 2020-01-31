@@ -245,20 +245,21 @@ def experiment():
     parser.add_argument('--test-data', default='data/naist_clean_char.src', help='test data')
     parser.add_argument('--save-dir', required=True, help='save dir')
     parser.add_argument('--save-file', default='output_gecmodel_last.char.txt', help='save file')
-    parser.add_argument('--kenlm', default=False, action='store_true', help='kenlm')
-    parser.add_argument('--transformer-lm', default=False, action='store_true', help='transformerLM')
+    parser.add_argument('--lm', default=None, choices=['kenlm', 'transformer_lm'])
     parser.add_argument('--lm-data', type=str, default=None, help='lm data')
     parser.add_argument('--lm-dict', type=str, default=None, help='transformerLM dict')
     parser.add_argument('--lm-weight', type=float, default=0.0, help='lm weight[0.0, 1.0]')
     parser.add_argument('--n-round', type=int, default=1, help='n-round')
     args = parser.parse_args()
 
-    if args.kenlm:
+    if args.lm == 'kenlm':
         from lm_model import KenLM
         lm = KenLM(args.lm_data)
-    if args.transformer_lm:
+    elif args.lm == 'transformer_lm':
         from lm_model import TransformerLM
         lm = TransformerLM(args.lm_data, args.lm_dict)
+    else:
+        lm = None
 
     model = GECModel(args.model_path, args.data_raw, args.option_file,
                      lm=lm, lm_weight=args.lm_weight)
