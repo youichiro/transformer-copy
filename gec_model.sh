@@ -41,8 +41,9 @@ CUDA_VISIBLE_DEVICES=$DEVICE python gec_model.py \
   --test-data $TEST_DATA \
   --save-dir $SAVE_DIR \
   --save-file $SAVE_FILE \
-  --kenlm-data $KENLM_DATA \
-  --kenlm-weight $KENLM_WEIGHT \
+  --kenlm \
+  --lm-data $KENLM_DATA \
+  --lm-weight $KENLM_WEIGHT \
   --n-round $N_ROUND
 
 echo "| calc M2score"
