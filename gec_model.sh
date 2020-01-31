@@ -44,7 +44,7 @@ CUDA_VISIBLE_DEVICES=$DEVICE python gec_model.py \
   --save-dir $SAVE_DIR \
   --save-file $SAVE_FILE \
   --lm transformer_lm \
-  --lm-data $LM_DATA \
+  --lm-data $TRANSLM_DATA \
   --lm-dict $TRANSLM_DICT \
   --lm-weight $LM_WEIGHT \
   --n-round $N_ROUND
