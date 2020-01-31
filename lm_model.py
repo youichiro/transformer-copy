@@ -99,10 +99,8 @@ class TransformerLM:
                     score_sum += pos_scores.sum().cpu()
                     count += pos_scores.numel() - skipped_toks
 
-        avg_nll_loss = -score_sum / count
-        perplexity = np.exp(avg_nll_loss)
-
-        return float(perplexity)
+        avg_nll_loss = score_sum / count
+        return float(avg_nll_loss)
 
 
 if __name__ == "__main__":
@@ -116,5 +114,5 @@ if __name__ == "__main__":
         '今 日 は 車 で 買 う 。',
     ]
     for s in sentences:
-        perplexity = lm.calc(s)
-        print(s, perplexity)
+        score = lm.calc(s)
+        print(s, score)
