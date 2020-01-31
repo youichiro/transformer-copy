@@ -27,7 +27,6 @@ class TransformerLM:
         parsed_args.path = model_path
         parsed_args.dict = dict_path
         parsed_args.max_sentence = 1
-        parsed_args.cpu = True
         parsed_args.gen_subset = 'test'
         parsed_args.raw_text = True
         parsed_args.no_progress_bar = True
@@ -44,8 +43,11 @@ class TransformerLM:
                 setattr(args, arg, getattr(parsed_args, arg))
         task = tasks.setup_task(args)
 
+        self.use_cuda = torch.cuda.is_available() and not parsed_args.cpu
         for model in models:
             model.make_generation_fast_()
+            if self.use_cuda:
+                model.cuda()
         assert len(models) > 0
 
         scorer = SequenceScorer(task.target_dictionary)
@@ -82,6 +84,7 @@ class TransformerLM:
         itr = self.make_itr(sentence)
         with progress_bar.build_progress_bar(self.args, itr) as t:
             for sample in t:
+                sample = utils.move_to_cuda(sample) if self.use_cuda else sample
                 if 'net_input' not in sample:
                     continue
                 hypos = self.scorer.generate(self.models, sample)
