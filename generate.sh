@@ -15,8 +15,6 @@ MODELS=out/models/models${exp}
 data_raws=('naist_clean_char.reverse')
 epochs=('_last' '_best')
 
-GLEU='/lab/ogawa/tools/jfleg/eval/gleu.py'
-
 for data_raw in ${data_raws[*]}; do
   for epoch in ${epochs[*]}; do
       echo -e "\n${data_raw} ${epoch}"
@@ -45,11 +43,6 @@ for data_raw in ${data_raws[*]}; do
       python2 ./gec_scripts/m2scorer/m2scorer -v ${output_pref}.char.txt data/${data_raw}.m2 > $output_m2score
       echo "[m2score]"
       tail -n 3 $output_m2score
-
-      python $GLEU --hyp ${output_pref}.char.txt --src data/${data_raw}.src \
-        --ref data/${data_raw}.tgt > $RESULT/gleu${epoch}.char.log
-      echo "[GLEU]"
-      tail -n 1 $RESULT/gleu${epoch}.char.log
   done
 done
 

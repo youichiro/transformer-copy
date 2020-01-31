@@ -11,8 +11,8 @@ DEVICE=$1
 EXP=$2
 RESULT=$3
 
-# TEST_PREF='naist_clean_char'
-TEST_PREF='lang8_char.dev'
+TEST_PREF='naist_clean_char'
+# TEST_PREF='lang8_char.dev'
 
 EPOCH='_last'
 MODEL_PATH="out/models/models${EXP}/checkpoint${EPOCH}.pt"
@@ -24,7 +24,7 @@ SAVE_FILE="output${EPOCH}.char.txt"
 OUTPUT_M2_FILE="m2score${EPOCH}.char.txt"
 KENLM_DATA='/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.6gram.binary'
 KENLM_WEIGHT=0.0
-N_ROUND=1
+N_ROUND=6
 
 mkdir -p $SAVE_DIR
 

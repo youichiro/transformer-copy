@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 import argparse
 import itertools
@@ -233,8 +234,7 @@ class GECModel:
 
 
     def run_generate(self, sentence, n_round=1):
-        for i in range(n_round):
-            print(i)
+        for _ in range(n_round):
             res = self.generate(sentence)
             assert len(res) == 1
             sentence = self.get_best_hypo(res[0])
@@ -242,21 +242,23 @@ class GECModel:
 
 
 def experiment():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model-path', required=True)
-    parser.add_argument('--data-raw', default='out/data_raw/naist_clean_char')
-    parser.add_argument('--option-file', default='option_files/exp.txt')
-    parser.add_argument('--test-data', default='data/naist_clean_char.src')
-    parser.add_argument('--save-dir', required=True)
-    parser.add_argument('--save-file', default='output_gecmodel_last.char.txt')
-    parser.add_argument('--kenlm-data', type=str, default=None)
-    parser.add_argument('--kenlm-weight', type=float, default=0.0)
-    parser.add_argument('--n-round', type=int, default=1)
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--model-path', required=True, help='model path')
+    parser.add_argument('--data-raw', default='out/data_raw/naist_clean_char', help='data_raw')
+    parser.add_argument('--option-file', default='option_files/exp.txt', help='option file')
+    parser.add_argument('--test-data', default='data/naist_clean_char.src', help='test data')
+    parser.add_argument('--save-dir', required=True, help='save dir')
+    parser.add_argument('--save-file', default='output_gecmodel_last.char.txt', help='save file')
+    parser.add_argument('--kenlm-data', type=str, default=None, help='kenlm data')
+    parser.add_argument('--kenlm-weight', type=float, default=0.0, help='kenlm weight[0.0, 1.0]')
+    parser.add_argument('--n-round', type=int, default=1, help='n-round')
     args = parser.parse_args()
 
     model = GECModel(args.model_path, args.data_raw, args.option_file,
                      kenlm_data=args.kenlm_data, kenlm_weight=args.kenlm_weight)
     data = open(args.test_data).readlines()
+
+    os.makedirs(args.save_dir, exist_ok=True)
 
     with open(args.save_dir + '/' + args.save_file, 'w') as f:
         for sentence in tqdm(data):

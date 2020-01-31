@@ -41,8 +41,5 @@ CUDA_VISIBLE_DEVICES=$device python train.py ${DATA_BIN}_1 \
   --positive-label-weight 3.0 \
   | tee $OUT/log/log$exp_${data_epoch}.out
 
-  # --token-labeling-loss-weight 0.1 \
-  # --token-labeling-positive-label-weight 5.0 \
-
 python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish pretraining: [$data_epoch] $PRETRAIN_CORPUS"
 

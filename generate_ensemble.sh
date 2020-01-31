@@ -12,9 +12,13 @@ exp=$2
 
 MODELS=(\
   out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
-  out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2_2nd/checkpoint_last.pt \
-  out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2_3rd/checkpoint_last.pt \
-  out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2_4th/checkpoint_last.pt \
+  out/models/models_lang8_uniq_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
+  out/models/models_lang8_char_with_pretrain_bccwj_char/checkpoint_last.pt \
+  out/models/models_lang8_uniq_char_with_pretrain_bccwj_char/checkpoint_last.pt \
+  out/models/models_lang8_char_with_pretrain_backtrans_bccwj_clean2_char/checkpoint_last.pt \
+  out/models/models_lang8_uniq_char_with_pretrain_backtrans_bccwj_clean2_char/checkpoint_last.pt \
+  out/models/models_lang8_char_without_pretrain/checkpoint_best.pt \
+  out/models/models_lang8_uniq_char_without_pretrain/checkpoint_last.pt \
 )
 MODELS=(`echo ${MODELS[@]}|tr ' ', ':'`)
 echo "| models: $MODELS"
@@ -36,7 +40,7 @@ for data_raw in ${data_raws[*]}; do
   --nbest 12 \
   --gen-subset test \
   --max-tokens 6000 \
-  --batch-size 16 \
+  --batch-size 8 \
   --no-progress-bar \
   --raw-text \
   --print-alignment \

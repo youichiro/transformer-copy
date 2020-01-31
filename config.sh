@@ -13,10 +13,10 @@ fi
 DATA='data'
 OUT='out'
 
-PRETRAIN_CORPUS='backtrans_bccwj_clean2_char'
-TRAIN_CORPUS='lang8_uniq_char'
-TRAIN_PREF='lang8_uniq_char.train'
-VALID_PREF='lang8_uniq_char.dev'
+PRETRAIN_CORPUS='ja_bccwj_clean_char_2'
+TRAIN_CORPUS='lang8_char'
+TRAIN_PREF='lang8_char.train'
+VALID_PREF='lang8_char.dev'
 DICT='dict_char.src.txt'
 
 DATA_ART=data_art/$PRETRAIN_CORPUS

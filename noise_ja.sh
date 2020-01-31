@@ -4,10 +4,10 @@ set -e
 set -u
 set -x
 
-corpus='data/bccwj_clean_unidic.chunk'
-plabels='data/bccwj_clean_unidic.plabels'
+corpus='data/lang8_train_unidic.chunk'
+plabels='data/lang8_train_unidic.plabels'
 pset='dicts/pset.txt'
-data_art='data_art/ja_bccwj_clean_char_2'
+data_art='data_art/ja_lang8'
 
 mkdir -p $data_art
 

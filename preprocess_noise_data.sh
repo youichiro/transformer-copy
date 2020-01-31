@@ -14,7 +14,7 @@ common_params="--source-lang src --target-lang tgt
 --joined-dictionary
 "
 
-for epoch in {1..1}; do
+for epoch in {2..9}; do
     trainpref=${DATA_ART}/${PRETRAIN_CORPUS}_$epoch
     validpref=$DATA/$VALID_PREF
     destdir=$OUT/data_bin_art/$PRETRAIN_CORPUS/data_bin_art_$epoch
@@ -28,7 +28,6 @@ for epoch in {1..1}; do
     --destdir $destdir \
     --output-format binary \
     --alignfile $trainpref.forward
-    # | tee $destdir.log
 
 done
 
