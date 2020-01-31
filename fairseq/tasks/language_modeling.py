@@ -108,6 +108,12 @@ class LanguageModelingTask(FairseqTask):
             if args.output_dictionary_size >= 0:
                 output_dictionary = TruncatedDictionary(dictionary, args.output_dictionary_size)
 
+        if hasattr(args, 'dict'):
+            dictionary = Dictionary.load(args.dict)
+            output_dictionary = dictionary
+            if args.output_dictionary_size >= 0:
+                output_dictionary = TruncatedDictionary(dictionary, args.output_dictionary_size)
+
         # upgrade old checkpoints
         if hasattr(args, 'exclude_self_target'):
             args.self_target = not args.exclude_self_target
@@ -187,6 +193,34 @@ class LanguageModelingTask(FairseqTask):
             add_eos_for_other_targets=add_eos_for_other_targets, shuffle=True,
             targets=self.targets,
         )
+
+
+    def load_sentence(self, split, sentence):
+        loaded_datasets = []
+        words = sentence.split(' ')
+        ds = IndexedRawTextDataset(words, self.dictionary)
+        loaded_datasets.append(
+            TokenBlockDataset(
+                ds, ds.sizes, self.args.tokens_per_sample,
+                pad=self.dictionary.pad(), eos=self.dictionary.eos(),
+                break_mode=self.args.sample_break_mode, include_targets=True,
+            )
+        )
+        if len(loaded_datasets) == 1:
+            dataset = loaded_datasets[0]
+            sizes = dataset.sizes
+        else:
+            dataset = ConcatDataset(loaded_datasets)
+            sizes = np.concatenate([ds.sizes for ds in loaded_datasets])
+
+        add_eos_for_other_targets = self.args.sample_break_mode is not None and self.args.sample_break_mode != 'none'
+
+        self.datasets[split] = MonolingualDataset(
+            dataset, sizes, self.dictionary, self.output_dictionary,
+            add_eos_for_other_targets=add_eos_for_other_targets, shuffle=True,
+            targets=self.targets,
+        )
+
 
     def build_dataset_for_inference(self, src_tokens, src_lengths):
         return TransformEosDataset(

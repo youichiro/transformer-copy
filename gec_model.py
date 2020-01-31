@@ -40,7 +40,7 @@ def make_batches(lines, args, task, max_positions):
 
 
 class GECModel:
-    def __init__(self, model_path, data_raw, option_file, kenlm_data=None, kenlm_weight=0.0):
+    def __init__(self, model_path, data_raw, option_file, lm=None, lm_weight=0.0):
         input_args = open(option_file).readlines()
         input_args = [['--' + arg.split('=')[0], arg.split('=')[1].replace("'", '').strip()]
                      for arg in input_args]
@@ -94,14 +94,6 @@ class GECModel:
             *[model.max_positions() for model in models]
         )
 
-        # KenLM
-        self.use_kenlm = True if kenlm_data and kenlm_weight > 0.0 else False
-        if self.use_kenlm:
-            from scripts.ken_lm import KenLM
-            self.kenlm = KenLM(kenlm_data)
-            self.kenlm_weight = kenlm_weight
-            assert 0.0 <= self.kenlm_weight <= 1.0
-
         self.args = args
         self.task = task
         self.max_positions = max_positions
@@ -110,6 +102,10 @@ class GECModel:
         self.src_dict = src_dict
         self.tgt_dict = tgt_dict
         self.align_dict = align_dict
+        # LM
+        self.lm = lm
+        self.lm_weight = lm_weight
+        assert 0.0 <= self.lm_weight <= 1.0
 
         print('| finish loading')
 
@@ -167,10 +163,10 @@ class GECModel:
         return d['best_hypo']['hypo_str']
 
 
-    def rerank_kenlm(self, d):
+    def rerank_lm(self, d):
         for hypo in d['hypos']:
-            score = self.kenlm.calc(hypo['hypo_str'])
-            hypo['score'] = hypo['score'] + self.kenlm_weight * score
+            score = self.lm.calc(hypo['hypo_str'])
+            hypo['score'] = hypo['score'] + self.lm_weight * score
         return d
 
 
@@ -225,8 +221,8 @@ class GECModel:
                     'positional_scores': positional_scores,
                     'alignment': alignment if self.args.print_alignment else None,
                 })
-            if self.use_kenlm:
-                d = self.rerank_kenlm(d)
+            if self.lm:
+                d = self.rerank_lm(d)
             d = self.add_best_hypo(d)
             res.append(d)
 
@@ -249,13 +245,23 @@ def experiment():
     parser.add_argument('--test-data', default='data/naist_clean_char.src', help='test data')
     parser.add_argument('--save-dir', required=True, help='save dir')
     parser.add_argument('--save-file', default='output_gecmodel_last.char.txt', help='save file')
-    parser.add_argument('--kenlm-data', type=str, default=None, help='kenlm data')
-    parser.add_argument('--kenlm-weight', type=float, default=0.0, help='kenlm weight[0.0, 1.0]')
+    parser.add_argument('--kenlm', default=False, action='store_true', help='kenlm')
+    parser.add_argument('--transformer-lm', default=False, action='store_true', help='transformerLM')
+    parser.add_argument('--lm-data', type=str, default=None, help='lm data')
+    parser.add_argument('--lm-dict', type=str, default=None, help='transformerLM dict')
+    parser.add_argument('--lm-weight', type=float, default=0.0, help='lm weight[0.0, 1.0]')
     parser.add_argument('--n-round', type=int, default=1, help='n-round')
     args = parser.parse_args()
 
+    if args.kenlm:
+        from lm_model import KenLM
+        lm = KenLM(args.lm_data)
+    if args.transformer_lm:
+        from lm_model import TransformerLM
+        lm = TransformerLM(args.lm_data, args.lm_dict)
+
     model = GECModel(args.model_path, args.data_raw, args.option_file,
-                     kenlm_data=args.kenlm_data, kenlm_weight=args.kenlm_weight)
+                     lm=lm, lm_weight=args.lm_weight)
     data = open(args.test_data).readlines()
 
     os.makedirs(args.save_dir, exist_ok=True)

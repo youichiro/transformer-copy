@@ -164,9 +164,12 @@ class IndexedRawTextDataset(torch.utils.data.Dataset):
         self.append_eos = append_eos
         self.reverse_order = reverse_order
         self.copy_ext_dict = copy_ext_dict
-        self.src_dataset = src_dataset 
+        self.src_dataset = src_dataset
 
-        self.read_data(path, dictionary)
+        if isinstance(path, str):
+            self.read_data(path, dictionary)
+        elif isinstance(path, list):
+            self.read_sentence(path, dictionary)
         self.size = len(self.tokens_list)
 
     def read_data(self, path, dictionary):
@@ -184,6 +187,23 @@ class IndexedRawTextDataset(torch.utils.data.Dataset):
                 self.tokens_list.append(tokens)
                 self.words_list.append(out_words)
                 self.sizes.append(len(tokens))
+        self.sizes = np.array(self.sizes)
+
+    def read_sentence(self, words, dictionary):
+        line = ' '.join(words)
+        self.lines.append(line)
+        out_words = []
+        copy_src_words = None if self.src_dataset is None else self.src_dataset.words_list[len(
+            self.lines)-1]
+        tokens = dictionary.encode_line(
+            line, add_if_not_exist=False,
+            append_eos=self.append_eos, reverse_order=self.reverse_order,
+            copy_ext_dict=self.copy_ext_dict, copy_src_words=copy_src_words,
+            out_words=out_words
+        ).long()
+        self.tokens_list.append(tokens)
+        self.words_list.append(out_words)
+        self.sizes.append(len(tokens))
         self.sizes = np.array(self.sizes)
 
     def check_index(self, i):
