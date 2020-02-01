@@ -40,7 +40,7 @@ def make_batches(lines, args, task, max_positions):
 
 
 class GECModel:
-    def __init__(self, model_path, data_raw, option_file, lm=None, lm_weight=0.0, print_hypos=False):
+    def __init__(self, model_path, data_raw, option_file, lm=None, lm_weight=0.0, print_hypos=False, reverse=False):
         input_args = open(option_file).readlines()
         input_args = [['--' + arg.split('=')[0], arg.split('=')[1].replace("'", '').strip()]
                      for arg in input_args]
@@ -103,6 +103,7 @@ class GECModel:
         self.tgt_dict = tgt_dict
         self.align_dict = align_dict
         self.print_hypos = print_hypos
+        self.reverse = reverse
         # LM
         self.lm = lm
         self.lm_weight = lm_weight
@@ -140,6 +141,7 @@ class GECModel:
         text = text.replace(' ', '')
         return text
 
+
     def sentence_split(self, text):
         if text[-1] != '。':
             text = text + '。'
@@ -158,6 +160,7 @@ class GECModel:
         d['best_hypo'] = best_hypo
         return d
 
+
     @staticmethod
     def get_best_hypo(d):
         assert 'best_hypo' in d.keys()
@@ -171,7 +174,22 @@ class GECModel:
         return d
 
 
+    @staticmethod
+    def reverse_result(d):
+        d['src_str'] = d['src_str'][::-1]
+        d['src_raw'] = d['src_raw'][::-1]
+        for hypo in d['hypos']:
+            hypo['hypo_str'] = hypo['hypo_str'][::-1]
+            hypo['hypo_raw'] = hypo['hypo_raw'][::-1]
+        if 'best_hypo' in d.keys():
+            d['best_hypo']['hypo_str'] = d['best_hypo']['hypo_str'][::-1]
+            d['best_hypo']['hypo_raw'] = d['best_hypo']['hypo_raw'][::-1]
+        return d
+
+
     def generate(self, sentence):
+        if self.reverse:
+            sentence = sentence[::-1]
         start_id = 0
         src_strs = []
         results = []
@@ -193,7 +211,6 @@ class GECModel:
                 src_tokens_i = utils.strip_pad(src_tokens[i], self.tgt_dict.pad())
                 results.append((start_id + id, src_tokens_i, hypos))
 
-        # sort output to match input order
         for id, src_tokens, hypos in sorted(results, key=lambda x: x[0]):
             src_str = self.src_dict.string(src_tokens, self.args.remove_bpe)
             d = {
@@ -222,9 +239,14 @@ class GECModel:
                     # 'positional_scores': positional_scores,
                     # 'alignment': alignment if self.args.print_alignment else None,
                 })
+
+            # reranking with language model
             if self.lm:
                 d = self.rerank_lm(d)
+
             d = self.add_best_hypo(d)
+            if self.reverse:
+                d = self.reverse_result(d)
             if self.print_hypos:
                 pprint(d)
             res.append(d)
@@ -254,6 +276,7 @@ def experiment():
     parser.add_argument('--lm-weight', type=float, default=0.0, help='lm weight[0.0, 1.0]')
     parser.add_argument('--n-round', type=int, default=1, help='n-round')
     parser.add_argument('--print-hypos', default=False, action='store_true', help='print hypos')
+    parser.add_argument('--reverse', default=False, action='store_true', help='reverse')
     args = parser.parse_args()
 
     if args.lm == 'kenlm':
@@ -267,7 +290,8 @@ def experiment():
         lm = None
 
     model = GECModel(args.model_path, args.data_raw, args.option_file,
-                     lm=lm, lm_weight=args.lm_weight, print_hypos=args.print_hypos)
+                     lm=lm, lm_weight=args.lm_weight,
+                     print_hypos=args.print_hypos, reverse=args.reverse)
     data = open(args.test_data).readlines()
 
     os.makedirs(args.save_dir, exist_ok=True)
