@@ -181,9 +181,6 @@ class GECModel:
         for hypo in d['hypos']:
             hypo['hypo_str'] = hypo['hypo_str'][::-1]
             hypo['hypo_raw'] = hypo['hypo_raw'][::-1]
-        if 'best_hypo' in d.keys():
-            d['best_hypo']['hypo_str'] = d['best_hypo']['hypo_str'][::-1]
-            d['best_hypo']['hypo_raw'] = d['best_hypo']['hypo_raw'][::-1]
         return d
 
 
@@ -244,9 +241,9 @@ class GECModel:
             if self.lm:
                 d = self.rerank_lm(d)
 
-            d = self.add_best_hypo(d)
             if self.reverse:
                 d = self.reverse_result(d)
+            d = self.add_best_hypo(d)
             if self.print_hypos:
                 pprint(d)
             res.append(d)
