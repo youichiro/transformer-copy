@@ -12,13 +12,9 @@ exp=$2
 
 MODELS=(\
   out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
-  out/models/models_lang8_uniq_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
   out/models/models_lang8_char_with_pretrain_bccwj_char/checkpoint_last.pt \
-  out/models/models_lang8_uniq_char_with_pretrain_bccwj_char/checkpoint_last.pt \
   out/models/models_lang8_char_with_pretrain_backtrans_bccwj_clean2_char/checkpoint_last.pt \
-  out/models/models_lang8_uniq_char_with_pretrain_backtrans_bccwj_clean2_char/checkpoint_last.pt \
   out/models/models_lang8_char_without_pretrain/checkpoint_best.pt \
-  out/models/models_lang8_uniq_char_without_pretrain/checkpoint_last.pt \
 )
 MODELS=(`echo ${MODELS[@]}|tr ' ', ':'`)
 echo "| models: $MODELS"

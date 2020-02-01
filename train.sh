@@ -15,13 +15,13 @@ fi
 
 
 mkdir $MODELS
-pretrained_model=./out/models/models_pretrain_backtrans_bccwj_clean2_char/checkpoint9.pt
+pretrained_model=./out/models/models_pretrain_ja_bccwj_clean_char_2_9times/checkpoint9.pt
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --save-dir $MODELS \
   --seed 4321 \
-  --max-epoch 30 \
+  --max-epoch 50 \
   --batch-size 128 \
-  --max-tokens 6000 \
+  --max-tokens 5800 \
   --train-subset train \
   --valid-subset valid \
   --arch transformer \
@@ -44,18 +44,19 @@ CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --weight-decay 0.0 \
   --no-ema \
   --positive-label-weight 1.2 \
+  --pretrained-model $pretrained_model \
   | tee $OUT/log/log$exp.out
 
-  # --copy-attention \
-  # --copy-attention-heads 1 \
-  # --copy-attention-dropout 0.2 \
-
-  # --token-labeling-loss-weight 0.1 \
-  # --token-labeling-positive-label-weight 5.0 \
   # --pretrained-model $pretrained_model \
 
-# finish
-python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish trainig: ${exp}"
+if [ $? -gt 0 ]; then
+  # send error message
+  python /lab/ogawa/scripts/slack/send_slack_message.py -m "Error!! training: ${exp} ($HOSTNAME)"
+else
+  # send finish message
+  python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish training: ${exp} ($HOSTNAME)"
+fi
+
 if [ $mpid -ne 0 ]; then
   kill -9 $mpid
 fi

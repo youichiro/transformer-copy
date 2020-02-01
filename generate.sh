@@ -11,12 +11,13 @@ device=$1
 exp=$2
 
 MODELS=out/models/models${exp}
-# data_raws=('naist_clean_char' 'naist_clean_uniq_char')
-data_raws=('naist_clean_char.reverse')
+# data_raws=('naist_clean_char')
+data_raws=('lang8_char.dev')
 epochs=('_last' '_best')
 
 for data_raw in ${data_raws[*]}; do
   for epoch in ${epochs[*]}; do
+  # for epoch in {1..30}; do
       echo -e "\n${data_raw} ${epoch}"
       RESULT=out/results/result${exp}/${data_raw}
       output_pref=$RESULT/output${epoch}
@@ -38,6 +39,11 @@ for data_raw in ${data_raws[*]}; do
       --copy-ext-dict --replace-unk \
       > ${output_pref}.nbest.txt
 
+      if [ $? -gt 0 ]; then
+        python /lab/ogawa/scripts/slack/send_slack_message.py -m "Error!! generate: ${exp} ($HOSTNAME)"
+        exit 1
+      fi
+
       cat ${output_pref}.nbest.txt | grep "^H" | python ./gec_scripts/sort.py 12 ${output_pref}.txt
       python ./gec_scripts/tokenize_character.py -f ${output_pref}.txt -o ${output_pref}.char.txt
       python2 ./gec_scripts/m2scorer/m2scorer -v ${output_pref}.char.txt data/${data_raw}.m2 > $output_m2score
@@ -46,5 +52,5 @@ for data_raw in ${data_raws[*]}; do
   done
 done
 
-python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish generate: ${exp}"
+python /lab/ogawa/scripts/slack/send_slack_message.py -m "Finish generate: ${exp} ($HOSTNAME)"
 
