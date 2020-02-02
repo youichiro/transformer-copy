@@ -302,16 +302,18 @@ def experiment():
                 outputs = model.run_generate(sentence, args.n_round)
                 f.write(outputs[-1] + '\n')
     elif args.n_round > 1:
-        save_file = 'output_{}round.char.txt'
-        files = [open(args.save_dir + '/' + save_file.format(i+1), 'w')
-                 for i in range(args.n_round)]
+        results = []
         for sentence in tqdm(data):
             sentence = sentence.replace('\n', '')
             outputs = model.run_generate(sentence, args.n_round)
-            for i in range(args.n_round):
-                files[i].write(outputs[i] + '\n')
+            results.append(outputs)
+
+        print('| saving results')
+        save_file = 'output_{}round.char.txt'
         for i in range(args.n_round):
-            files[i].close()
+            with open(args.save_dir + '/' + save_file.format(i+1), 'w') as f:
+                for outputs in results:
+                    f.write(outputs[i] + '\n')
 
 
 if __name__ == '__main__':
