@@ -12,9 +12,7 @@ exp=$2
 
 MODELS=(\
   out/models/models_lang8_char_with_pretrain_ja_bccwj_clean_char_2/checkpoint_last.pt \
-  out/models/models_lang8_char_with_pretrain_bccwj_char/checkpoint_last.pt \
   out/models/models_lang8_char_with_pretrain_backtrans_bccwj_clean2_char/checkpoint_last.pt \
-  out/models/models_lang8_char_without_pretrain/checkpoint_best.pt \
 )
 MODELS=(`echo ${MODELS[@]}|tr ' ', ':'`)
 echo "| models: $MODELS"
@@ -30,7 +28,7 @@ for data_raw in ${data_raws[*]}; do
   mkdir -p $RESULT
   echo $MODELS > $RESULT/models.txt
 
-  CUDA_VISIBLE_DVICES=$device python generate.py out/data_raw/${data_raw} \
+  CUDA_VISIBLE_DEVICES=$device python generate.py out/data_raw/${data_raw} \
   --path $MODELS \
   --beam 12 \
   --nbest 12 \
