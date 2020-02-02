@@ -252,11 +252,13 @@ class GECModel:
 
 
     def run_generate(self, sentence, n_round=1):
+        outputs = []
         for _ in range(n_round):
             res = self.generate(sentence)
             assert len(res) == 1
             sentence = self.get_best_hypo(res[0])
-        return sentence
+            outputs.append(sentence)
+        return outputs
 
 
 def experiment():
@@ -293,12 +295,23 @@ def experiment():
 
     os.makedirs(args.save_dir, exist_ok=True)
 
-    with open(args.save_dir + '/' + args.save_file, 'w') as f:
+    if args.n_round == 1:
+        with open(args.save_dir + '/' + args.save_file, 'w') as f:
+            for sentence in tqdm(data):
+                sentence = sentence.replace('\n', '')
+                outputs = model.run_generate(sentence, args.n_round)
+                f.write(outputs[-1] + '\n')
+    elif args.n_round > 1:
+        save_file = 'output_{}round.char.txt'
+        files = [open(args.save_dir + '/' + save_file.format(i+1), 'w')
+                 for i in range(args.n_round)]
         for sentence in tqdm(data):
             sentence = sentence.replace('\n', '')
-            output = model.run_generate(sentence, args.n_round)
-            f.write(output + '\n')
-
+            outputs = model.run_generate(sentence, args.n_round)
+            for i in range(args.n_round):
+                files[i].write(outputs[i] + '\n')
+        for i in range(args.n_round):
+            files[i].close()
 
 
 if __name__ == '__main__':
