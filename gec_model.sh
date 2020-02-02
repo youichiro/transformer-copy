@@ -24,8 +24,8 @@ SAVE_FILE="output${EPOCH}.char.txt"
 OUTPUT_M2_FILE="m2score${EPOCH}.char.txt"
 TRANSLM_DATA='out/models_lm/bccwj_clean2_char+lang8_char_train/checkpoint_last.pt'
 TRANSLM_DICT='out/data_bin_lm/bccwj_clean2_char+lang8_char_train/dict.txt'
-KENLM_DATA='/lab/ogawa/tools/kenlm/data/bccwj_clean2_char/bccwj_clean2_char.6gram.binary'
-LM_WEIGHT=0.05
+KENLM_DATA='/lab/ogawa/tools/kenlm/data/bccwj_clean2_char+lang8_char/bccwj_clean2_char+lang8_char.5gram.binary'
+LM_WEIGHT=0.2
 N_ROUND=1
 
 mkdir -p $SAVE_DIR
@@ -43,8 +43,8 @@ CUDA_VISIBLE_DEVICES=$DEVICE python gec_model.py \
   --test-data $TEST_DATA \
   --save-dir $SAVE_DIR \
   --save-file $SAVE_FILE \
-  --lm transformer_lm \
-  --lm-data $TRANSLM_DATA \
+  --lm kenlm \
+  --lm-data $KENLM_DATA \
   --lm-dict $TRANSLM_DICT \
   --lm-weight $LM_WEIGHT \
   --n-round $N_ROUND

@@ -233,8 +233,8 @@ class GECModel:
                     'hypo_str': hypo_str,
                     'hypo_raw': hypo_str.replace(' ', ''),
                     'score': hypo['score'],
-                    # 'positional_scores': positional_scores,
-                    # 'alignment': alignment if self.args.print_alignment else None,
+                    'positional_scores': positional_scores,
+                    'alignment': alignment if self.args.print_alignment else None,
                 })
 
             # reranking with language model

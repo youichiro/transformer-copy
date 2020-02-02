@@ -19,7 +19,7 @@ pretrained_model=./out/models/models_pretrain_ja_bccwj_clean_char_2_9times/check
 CUDA_VISIBLE_DEVICES=$device python train.py $DATA_BIN \
   --save-dir $MODELS \
   --seed 4321 \
-  --max-epoch 50 \
+  --max-epoch 30 \
   --batch-size 128 \
   --max-tokens 5800 \
   --train-subset train \
