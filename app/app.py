@@ -11,7 +11,7 @@ from utils import text_clean, sentence_split
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from gec_model import GECModel
 
-mode = 'docker'  # ('local', 'docker')
+mode = 'local'  # ('local', 'docker')
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -27,7 +27,6 @@ url_prefix = ini.get(mode, 'url_prefix')
 
 base_model = GECModel(model_path, data_raw, option_file)
 second_model = GECModel(second_model_path, data_raw, option_file)
-models = [base_model, second_model]
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -45,7 +44,7 @@ def api():
     for line in lines:
         if not line or line == ' ' or line.replace(' ', '') == '。':
             continue
-        res = generate(line, times=4, rounds=2, mode=mode)[0]
+        res = generate(line, times=2, rounds=2, mode=mode)[0]
         res['src_str'] = line
         res['src_raw'] = line.replace(' ', '')
         res['edits'] = get_aligned_edits(res['src_raw'], res['best_hypo']['hypo_raw'])
@@ -53,24 +52,29 @@ def api():
     return jsonify({'res': results})
 
 
-def generate(sentence, times=4, rounds=2, mode='local'):
-    for model in models:
-        for _ in range(rounds):
-            scores = []
-            for _ in range(times):
-                res = model.generate(sentence)
-                hypos = res[0]['hypos']
-                for hypo in hypos:
-                    scores.append([hypo['score'], hypo['hypo_raw']])
-            scores = sorted(scores, reverse=True)
-            if mode == 'local':
-                pprint(scores)
-            best_hypo = scores[0]
-            sentence = ' '.join(best_hypo[1])
+def generate_single(sentence, model, times, mode):
+    scores = []
+    for _ in range(times):
+        res = model.generate(sentence)
+        hypos = res[0]['hypos']
+        for hypo in hypos:
+            scores.append([hypo['score'], hypo['hypo_raw']])
+    scores = sorted(scores, reverse=True)
+    if mode == 'local':
+        pprint(scores)
+    best_hypo_score, best_hypo_raw = scores[0]
+    best_hypo_str = ' '.join(best_hypo_raw)
     # update best_hypo
-    res[0]['best_hypo']['hypo_raw'] = best_hypo[1]
-    res[0]['best_hypo']['score'] = best_hypo[0]
-    res[0]['best_hypo']['hypo_str'] = ' '.join(best_hypo[1])
+    res[0]['best_hypo']['hypo_raw'] = best_hypo_raw
+    res[0]['best_hypo']['score'] = best_hypo_score
+    res[0]['best_hypo']['hypo_str'] = best_hypo_str
+    return res, best_hypo_str
+
+
+def generate(sentence, times=2, mode='local'):
+    res, best = generate_single(sentence, base_model, times, mode)
+    res, best = generate_single(best, base_model, times, mode)
+    res, best = generate_single(best, second_model, times, mode)
     return res
 
 
