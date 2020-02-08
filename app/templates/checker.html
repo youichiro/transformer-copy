@@ -81,43 +81,50 @@
     })
   }
 
+  function getResult(ajaxResponse) {
+    var results = "";
+    for (i in ajaxResponse["res"]) {
+      var res = ajaxResponse["res"][i];
+      var src_edit_pos = res["edits"]["src_edit_pos"];
+      var tgt_edit_pos = res["edits"]["tgt_edit_pos"];
+      var src_tokens = res["src_str"].split(" ");
+      var tgt_tokens = res["best_hypo"]["hypo_str"].split(" ")
+
+      // source box
+      var src_html = "";
+      for (i in src_tokens) {
+        if (src_edit_pos.includes(parseInt(i))) {
+          src_html += "<span class='token error-token'>" + src_tokens[i] + "</span>";
+        } else {
+          src_html += "<span class='token'>" + src_tokens[i] + "</span>";
+        }
+      }
+      var src_box = "<div class='result-box'><div class='prefix'></div><div>" + src_html + "</div></div>";
+
+      // target box
+      var tgt_html = "";
+      for (i in tgt_tokens) {
+        if (tgt_edit_pos.includes(parseInt(i))) {
+          tgt_html += "<span class='token corr-token'>" + tgt_tokens[i] + "</span>";
+        } else {
+          tgt_html += "<span class='token'>" + tgt_tokens[i] + "</span>";
+        }
+      }
+      var tgt_box = "<div class='result-box'><div class='prefix'>▶︎</div><div>" + tgt_html + "</div></div>";
+
+      // result
+      results += "<div class='result-pair'>" + src_box + tgt_box + "</div>";
+    }
+    return results
+  }
+
   $("#submit-btn").on("click", function() {
     event.preventDefault();
     $("#result").html("");
     var text = $("#input_text").val();
-    ajax(text).done(function(result) {
-      for (i in result["res"]) {
-        var res = result["res"][i];
-        var src_edit_pos = res["edits"]["src_edit_pos"];
-        var tgt_edit_pos = res["edits"]["tgt_edit_pos"];
-        var src_tokens = res["src_str"].split(" ");
-        var tgt_tokens = res["best_hypo"]["hypo_str"].split(" ")
-
-        // source box
-        var src_html = "　　";
-        for (i in src_tokens) {
-          if (src_edit_pos.includes(parseInt(i))) {
-            src_html += "<span class='token error-token'>" + src_tokens[i] + "</span>";
-          } else {
-            src_html += "<span class='token'>" + src_tokens[i] + "</span>";
-          }
-        }
-        var src_box = "<div class='result-box'>" + src_html + "</div>";
-
-        // target box
-        var tgt_html = "▶︎　";
-        for (i in tgt_tokens) {
-          if (tgt_edit_pos.includes(parseInt(i))) {
-            tgt_html += "<span class='token corr-token'>" + tgt_tokens[i] + "</span>";
-          } else {
-            tgt_html += "<span class='token'>" + tgt_tokens[i] + "</span>";
-          }
-        }
-        var tgt_box = "<div class='result-box'>" + tgt_html + "</div>";
-
-        // display result
-        $("#result").append($("<div class='result-pair'>" + src_box + tgt_box + "</div>"));
-      }
+    ajax(text).done(function(res) {
+      var results = getResult(res);
+      $("#result").html(results);
     }).fail(function() {
       console.log("error");
     });

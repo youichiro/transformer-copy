@@ -13,15 +13,20 @@ body {
     margin: 20px 0;
 }
 
-.result-pair {
+#result>.result-pair {
     background-color: aliceblue;
     margin-bottom: 40px;
     padding: 10px;
 }
 
-.result-box {
+.result-pair>.result-box {
     margin: 4px 10px;
     padding: 10px;
+    display: flex;
+}
+
+.result-box>.prefix {
+    width: 30px;
 }
 
 .token {
@@ -43,11 +48,11 @@ body {
     color: gray;
 }
 
-.info-header {
+.info>.info-header {
     padding: 10px 0;
 }
 
-.info-body {
+.info>.info-body {
     padding: 10px;
     border: solid 2px #f3f3f3;
 }
