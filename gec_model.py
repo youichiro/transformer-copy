@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-import re
 import argparse
 import itertools
 from collections import namedtuple
 from pprint import pprint
 
-import emoji
-import regex
-import neologdn
 from tqdm import tqdm
 import torch
 from fairseq import options, tasks, utils
@@ -113,47 +109,6 @@ class GECModel:
 
 
     @staticmethod
-    def text_clean(text):
-        text = text.replace('\u3000', '')
-        text = neologdn.normalize(text, repeat=3)
-        text = ''.join(['' if c in emoji.UNICODE_EMOJI else c for c in text])
-        text = re.sub(r'(\d)([,.])(\d+)', r'\1\3', text)
-        text = re.sub(r'\d+', '0', text)
-        text = re.sub(r'[!-/:-@[-`{-~]', r'', text)
-        text = re.sub(u'[■-♯]', '', text)
-        text = regex.sub(r'^(\p{Nd}+\p{Zs})(.*)$', r'\2', text)
-        text = text.strip()
-        text = text.replace('“', '')
-        text = text.replace('…', '')
-        text = text.replace('『', '「')
-        text = text.replace('』', '」')
-        text = text.replace('《', '「')
-        text = text.replace('》', '」')
-        text = text.replace('〕', '）')
-        text = text.replace('〔', '（')
-        text = text.replace('〈', '（')
-        text = text.replace('〉', '）')
-        text = text.replace('→', '')
-        text = text.replace(',', '、')
-        text = text.replace('，', '、')
-        text = text.replace('．', '。')
-        text = text.replace('.', '。')
-        text = text.replace(' ', '')
-        return text
-
-
-    def sentence_split(self, text):
-        if text[-1] != '。':
-            text = text + '。'
-        text = self.text_clean(text)
-        text = ' '.join(text.replace(' ', ''))  # 文字分割
-        text = text.replace('。', '。\n')
-        lines = re.split('[\t\n]', text)  # 文分割
-        lines = [line for line in lines if line]
-        return lines
-
-
-    @staticmethod
     def add_best_hypo(d):
         sorted_hypos = sorted(d['hypos'], key=lambda x:x['score'], reverse=True)
         best_hypo = sorted_hypos[0]
@@ -233,8 +188,8 @@ class GECModel:
                     'hypo_str': hypo_str,
                     'hypo_raw': hypo_str.replace(' ', ''),
                     'score': hypo['score'],
-                    'positional_scores': positional_scores,
-                    'alignment': alignment if self.args.print_alignment else None,
+                    # 'positional_scores': positional_scores,
+                    # 'alignment': alignment if self.args.print_alignment else None,
                 })
 
             # reranking with language model
