@@ -72,8 +72,11 @@ def generate_single(sentence, model, times, mode):
 
 
 def generate(sentence, times=2, mode='local'):
+    # base model
     res, best = generate_single(sentence, base_model, times, mode)
+    # -> base 2-round
     res, best = generate_single(best, base_model, times, mode)
+    # -> right-to-left model
     res, best = generate_single(best, second_model, times, mode)
     return res
 
