@@ -11,7 +11,7 @@ from utils import text_clean, sentence_split
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from gec_model import GECModel
 
-mode = 'local'  # ('local', 'docker')
+mode = 'docker'  # ('local', 'docker')
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -44,7 +44,7 @@ def api():
     for line in lines:
         if not line or line == ' ' or line.replace(' ', '') == '。':
             continue
-        res = generate(line, times=2, rounds=2, mode=mode)[0]
+        res = generate(line, times=2, mode=mode)[0]
         res['src_str'] = line
         res['src_raw'] = line.replace(' ', '')
         res['edits'] = get_aligned_edits(res['src_raw'], res['best_hypo']['hypo_raw'])
