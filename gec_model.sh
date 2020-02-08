@@ -3,7 +3,7 @@ set -e
 set -u
 
 if [ $# -ne 3 ]; then
-  echo "usage: python generate.sh <device> <exp> <result>" 1>&2
+  echo "usage: sh gec_model.sh <device> <exp> <result>" 1>&2
   exit 1
 fi
 
