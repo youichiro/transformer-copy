@@ -1,5 +1,5 @@
-beam=4
-nbest=4
+beam=8
+nbest=8
 cpu=True
 gen_subset='test'
 max_len_a=0
