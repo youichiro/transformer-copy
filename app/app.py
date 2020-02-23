@@ -34,6 +34,11 @@ def main():
     return render_template('checker.html', prefix=url_prefix)
 
 
+@app.route('/en', methods=['GET', 'POST'])
+def main_en():
+    return render_template('checker_en.html', prefix=url_prefix)
+
+
 @app.route('/api', methods=['GET'])
 def api():
     text = request.args.get('input_text')

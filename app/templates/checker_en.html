@@ -1,6 +1,6 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}日本語文法誤りチェッカー{% endblock %}
+{% block title %}Japanese Grammatical Error Checker{% endblock %}
 
 {% block styles %}
 {{ super() }}
@@ -10,42 +10,42 @@
 
 {% block content %}
 <div class="container">
-  <a href="{{ prefix }}/en" style="float: right;">[English]</a>
-  <h1>日本語文法誤りチェッカー</h1>
+  <a href="{{ prefix }}/" style="float: right;">[Japanese]</a>
+  <h1>Japanese Grammatical Error Checker</h1>
   <hr>
   <form>
     <div class="form-group">
       <textarea class="form-control" id="input_text" rows="5" maxlength="300" name="input_text"
-                placeholder="ここに文を入力"></textarea>
+                placeholder="Input Japanese sentence"></textarea>
     </div>
     <br>
     <button type="submit" id="submit-btn" class="btn btn-primary btn-lg btn-block">
-      訂正する
+      Correction
     </button>
   </form>
 
   <br>
   <div class="card">
-    <div class="card-header">結果</div>
+    <div class="card-header">Result</div>
     <div class="card-body">
       <div id="result"></div>
     </div>
   </div>
 
   <div class="info" style="margin-top: 100px;">
-    <div class="info-header">注意事項</div>
+    <div class="info-header">Notes</div>
     <div class="info-body">
       <ul>
-        <li>句点(。)または改行で文を区切ります。</li>
-        <li>数字は全て0に変換されます。</li>
-        <li>句読点(、。)と大カッコ(「 」)以外の記号は削除されます。</li>
-        <li>長い文章は結果が表示されないことがあります。</li>
+        <li>Sentences are separated with period (。 or .) or line feed.</li>
+        <li>All numbers are converted to 0.</li>
+        <li>Symbols other than punctuation (、 and 。) and brackets (「 and 」) are removed.</li>
+        <li>Long texts may not show results.</li>
       </ul>
     </div>
   </div>
 
   <div class="info">
-    <div class="info-header">入力例</div>
+    <div class="info-header">Input examples</div>
     <div class="info-body">
       <ul>
         <li>質問を対応する。</li>
@@ -60,7 +60,9 @@
 
 <footer class="footer">
   <div class="container">
-    <p class="text-muted">長岡技術科学大学 自然言語処理研究室</p>
+    <p class="text-muted">
+      Nagaoka University of Technology, Natural Language Processing Laboratory
+    </p>
   </div>
 </footer>
 {% endblock %}
