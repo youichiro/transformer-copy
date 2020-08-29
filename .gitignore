@@ -11,7 +11,7 @@ out/models_lm
 fairseq.egg-info
 build
 data/*
-data_*
+data_art/*
 dicts/*
 out_*
 analysis
