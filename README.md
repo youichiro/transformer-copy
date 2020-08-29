@@ -42,6 +42,11 @@
 `align.sh`を実行し、アライメントファイルを作成する
 [fast_align](https://github.com/clab/fast_align)と[mosesdecoder](https://github.com/moses-smt/mosesdecoder)を事前にインストールしておき、そのパスを指定する必要がある
 
+
+### generate pseudo data
+`noise.sh`を実行し、擬似誤りデータセットを生成する
+
+
 ### preprocess
 `preprocess.sh`を実行し、データセットの前処理を行う
 
@@ -55,10 +60,6 @@
     - preprocess_noise_data.sh
     - preprocess_test.sh
     - preprocess_train.sh
-
-
-### generate pseudo data
-`noise.sh`を実行し、擬似誤りデータセットを生成する
 
 
 ### pretrain
