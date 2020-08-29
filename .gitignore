@@ -1,7 +1,13 @@
 .DS_Store
 __pycache__
 .python-version
-out/*
+out/data_bin/*
+out/data_raw/*
+out/data_bin_art/*
+out/models/*
+out/results/*
+out/log/*
+out/models_lm
 fairseq.egg-info
 build
 data/*
