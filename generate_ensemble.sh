@@ -3,7 +3,7 @@ set -e
 set -u
 
 if [ $# -ne 2 ]; then
-  echo "usage: python generate.sh <device> <exp>" 1>&2
+  echo "usage: bash generate.sh <device> <exp>" 1>&2
   exit 1
 fi
 

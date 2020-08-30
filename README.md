@@ -35,8 +35,13 @@
 手順：
 - データセットをセグメント(単語分割等)する
 - train, valid, testに分割する
-  - このとき拡張子だけ異なるファイル名にする
+- 誤り文側と正解文側でファイルを分ける
 - `data`ディレクトリに配置する
+- ファイル名の例：
+  - lang8.train.src  # 訓練データの誤り文側
+  - lang8.train.tgt  # 訓練データの正解文側
+  - lang8.valid.src  # 開発データの誤り文側
+  - lang8.valid.tgt  # 開発データの正解文側
 
 ### alignment
 `align.sh`を実行し、アライメントファイルを作成する
@@ -49,23 +54,22 @@
 
 ### preprocess
 `preprocess.sh`を実行し、データセットの前処理を行う
-
-- preprocess.py
-  - 使用するデータの前処理を行うスクリプト
-- preprocess.sh
-  - preprocess.pyを実行するためのシェルスクリプト
-  - データの指定や保存先などを指定して実行する
-  - 以下はわかりやすいようにデータセットごとにスクリプトを分けたもの
-    - preprocess_lm_data.sh
-    - preprocess_noise_data.sh
-    - preprocess_test.sh
-    - preprocess_train.sh
+訓練データ(train, valid)は`preprocess_train.sh`、評価データは`preprocess_test.sh`のように分けている
+前処理されたデータセットは`out/data_bin`もしくは`out/data_raw`に出力される
 
 
 ### pretrain
-
+`pretrain.sh`を実行し、データセット等を指定してpre-trainingを行う
+コマンド自体は`train.sh`と同じで、オプションが異なる
+学習済みモデルは`out/models`に保存される
 
 ### train
+`train.sh`を実行し、データセット等を指定してtrainを行う
+pretrainモデルを指定してfine-tuningしたい場合は`--pretrained-model $pretrained_model`をオプションに追加する
+学習済みモデルは`out/models`に保存される
 
 
 ### generate
+`generate.sh`を実行し、学習済みモデルを使って文生成を行う
+`data_rows`は評価データのリスト、`epochs`はどのエポックのモデルかのリストで、for文でそれぞれを一度に実行するようにしている
+生成データは`out/results`に保存される

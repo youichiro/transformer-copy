@@ -3,7 +3,7 @@ set -e
 set -u
 
 if [ $# -ne 2 ]; then
-  echo "usage: python generate.sh <device> <exp>" 1>&2
+  echo "usage: bash generate.sh <device> <exp>" 1>&2
   exit 1
 fi
 
@@ -11,7 +11,6 @@ device=$1
 exp=$2
 
 MODELS=out/models/models${exp}
-# data_raws=('naist_clean_char')
 data_raws=('lang8_char.dev')
 epochs=('_last' '_best')
 
