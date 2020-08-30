@@ -72,4 +72,6 @@ pretrainモデルを指定してfine-tuningしたい場合は`--pretrained-model
 ### generate
 `generate.sh`を実行し、学習済みモデルを使って文生成を行う
 `data_rows`は評価データのリスト、`epochs`はどのエポックのモデルかのリストで、for文でそれぞれを一度に実行するようにしている
+評価データのM2ファイルを用意しておく必要がある。[ERRANT](https://github.com/chrisjbryant/errant)の`errant_parallel`を使用してM2ファイルを作成する。
+`python2`を実行できるようにしておく必要がある
 生成データは`out/results`に保存される
