@@ -11,7 +11,7 @@ device=$1
 exp=$2
 
 MODELS=out/models/models${exp}
-data_raws=('lang8_char.dev')
+data_raws=('lang8_char')
 epochs=('_last' '_best')
 
 for data_raw in ${data_raws[*]}; do

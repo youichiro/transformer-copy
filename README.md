@@ -1,5 +1,10 @@
 # transformer-copy
 
+## 論文
+小川 耀一朗, 山本 和英. 「日本語誤り訂正における誤り傾向を考慮した擬似誤り生成」. 言語処理学会第26回年次大会
+https://www.anlp.jp/proceedings/annual_meeting/2020/pdf_dir/F2-3.pdf
+
+
 ## ディレクトリ構成
 - app
   - アプリケーションのソースコード
@@ -38,10 +43,10 @@
 - 誤り文側と正解文側でファイルを分ける
 - `data`ディレクトリに配置する
 - ファイル名の例：
-  - lang8.train.src  # 訓練データの誤り文側
-  - lang8.train.tgt  # 訓練データの正解文側
-  - lang8.valid.src  # 開発データの誤り文側
-  - lang8.valid.tgt  # 開発データの正解文側
+  - corpus.train.src  # 訓練データの誤り文側
+  - corpus.train.tgt  # 訓練データの正解文側
+  - corpus.valid.src  # 開発データの誤り文側
+  - corpus.valid.tgt  # 開発データの正解文側
 
 ### alignment
 `align.sh`を実行し、アライメントファイルを作成する
