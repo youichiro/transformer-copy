@@ -7,6 +7,9 @@ https://www.anlp.jp/proceedings/annual_meeting/2020/pdf_dir/F2-3.pdf
 ## デモサイト
 https://app.jnlp.org/gec/
 
+![gec](https://user-images.githubusercontent.com/20487308/94277394-77dd9e00-ff84-11ea-945b-5b4f1b522ec9.gif)
+
+
 ## ディレクトリ構成
 - app
   - アプリケーションのソースコード
