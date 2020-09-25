@@ -4,6 +4,8 @@
 小川 耀一朗, 山本 和英. 「日本語誤り訂正における誤り傾向を考慮した擬似誤り生成」. 言語処理学会第26回年次大会
 https://www.anlp.jp/proceedings/annual_meeting/2020/pdf_dir/F2-3.pdf
 
+## デモサイト
+https://app.jnlp.org/gec/
 
 ## ディレクトリ構成
 - app
@@ -80,3 +82,7 @@ pretrainモデルを指定してfine-tuningしたい場合は`--pretrained-model
 評価データのM2ファイルを用意しておく必要がある。[ERRANT](https://github.com/chrisjbryant/errant)の`errant_parallel`を使用してM2ファイルを作成する。
 `python2`を実行できるようにしておく必要がある
 生成データは`out/results`に保存される
+
+
+## 参考
+https://github.com/zhawe01/fairseq-gec
