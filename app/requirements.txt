@@ -8,7 +8,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.1
 MarkupSafe==1.1.1
 neologdn==0.4
-numpy==1.18.1
+numpy==1.22.0
 regex==2020.1.8
 torch==1.0.0
 tqdm==4.42.1
